@@ -1,16 +1,15 @@
 const { pool } = require("./dbConfig");
 
 
-const getUsers = () => {
-  return new Promise(function(resolve, reject) {
-    pool.query('SELECT * FROM users', (error, results) => {
-      if (error) {
-        reject(error)
-      }
-      resolve(results.rows);
-    })
-  }) 
+const getUsers = async () => {
+  try {
+    const result = await pool.query('SELECT * FROM users');
+    return result.rows;
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving users from database');
+  }
 }
-  module.exports = {
-    getUsers,
+module.exports = {
+  getUsers,
 }
