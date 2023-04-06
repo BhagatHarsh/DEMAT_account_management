@@ -46,6 +46,33 @@ const registerUser = (data) => {
 };
 
 
+// const loginUser = (data) => {
+//   return new Promise((resolve, reject) => {
+//     // hash the password
+//     bcrypt.hash(data.password, 10, (err, hash) => {
+//       if (err) {
+//         reject(err);
+//       } else {
+//         // SQL query with parameterized placeholders
+//         const query = 'INSERT INTO users (pan_number, pincode, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5)';
+
+//         // array of parameter values to be passed to the query
+//         const values = [data.pan_number, data.pincode, hash, data.first_name, data.last_name];
+
+//         // execute the query with the parameter values
+//         pool.query(query, values, (err, res) => {
+//           if (err) {
+//             reject(err);
+//           } else {
+//             resolve('Data inserted successfully');
+//           }
+//         });
+//       }
+//     });
+//   });
+// }
+
+
 module.exports = {
       getUsers,
       registerUser
