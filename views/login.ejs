@@ -12,33 +12,17 @@
   </head>
   <body>
     <h1>Login</h1>
-
-    <ul>
-      <% if (typeof errors != 'undefined') { %> <% errors.forEach(error => { %>
-      <li><%= error.message %></li>
-      <% }) %> <% } %>
-    </ul>
-
-    <ul>
-      <% if(messages.success_msg) { %>
-      <li><%= messages.success_msg %></li>
-      <% } %>
-    </ul>
-
-    <ul>
-      <% if (messages.error) { %>
-      <li><%= messages.error %></li>
-      <% } %>
-    </ul>
-
-    <form action="/users/login" method="POST">
+    <form action="/login" method="POST">
       <div>
         <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="Email"
+          type="text"
+          id="pan"
+          name="pan_number"
+          placeholder="PAN"
           required
+          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+          oninvalid="this.setCustomValidity('Please enter a valid PAN number')"
+          onchange="this.setCustomValidity('')"
         />
       </div>
       <div>
@@ -48,13 +32,16 @@
           name="password"
           placeholder="Password"
           required
+          pattern=".{8,}"
+          oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')"
+          onchange="this.setCustomValidity('')"
         />
       </div>
       <div>
         <input type="submit" value="Login" />
       </div>
-
-      <a href="/users/register">Register</a>
-    </form>
+    
+      <a href="/register">Register</a>
+    </form>    
   </body>
 </html>
