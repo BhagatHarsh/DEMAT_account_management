@@ -82,6 +82,10 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// app.get('/',(req, res) => {
+//   res.render(__dirname + '/views/index.ejs')
+// })
+
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
 })
