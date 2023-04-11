@@ -81,20 +81,56 @@
       </div>
       <div>
         <input
-          type="password"
-          id="password2"
-          name="password2"
-          placeholder="Confirm Password"
+          type="text"
+          id="phone_number"
+          name="phone_number"
+          placeholder="Phone Number"
           required
-          pattern=".{8,}"
-          oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')"
+          pattern="[0-9]{10}"
+          oninvalid="this.setCustomValidity('Please enter a valid 10-digit phone number')"
           onchange="this.setCustomValidity('')"
         />
       </div>
       <div>
-        <input type="submit" value="Register" />
+        <input
+          type="text"
+          id="account_number"
+          name="account_number"
+          placeholder="Account Number"
+          required
+          pattern="[0-9]{10}"
+          oninvalid="this.setCustomValidity('Please enter a valid 10-digit phone number')"
+          onchange="this.setCustomValidity('')"
+        />
       </div>
-    
+      <div>
+        <input
+          type="text"
+          id="ifsc_code"
+          name="ifsc_code"
+          placeholder="IFSC Code"
+          required
+          pattern="[A-Z]{4}[0][A-Z0-9]{6}"
+          oninvalid="this.setCustomValidity('Please enter a valid IFSC code')"
+          onchange="this.setCustomValidity('')"
+        />
+      </div>
+      <div>
+        <input
+          type="text"
+          id="bank_name"
+          name="bank_name"
+          placeholder="Bank Name"
+          required
+          pattern="[a-zA-Z]+"
+          oninvalid="this.setCustomValidity('Please enter a valid bank name')"
+          onchange="this.setCustomValidity('')"
+        />
+      </div>
+      <div>
+        <button type="submit" class="button-primary">Register</button>
+      </div>
+      
       <a href="/login">Already registered? Login here</a>
     </form>    
   </body>

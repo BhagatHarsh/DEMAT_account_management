@@ -12,6 +12,9 @@
   </head>
   <body>
     <h1>Login</h1>
+    <% if (message) { %>
+      <p><%= message %></p>
+    <% } %>
     <form action="/login" method="POST">
       <div>
         <input
@@ -40,8 +43,7 @@
       <div>
         <input type="submit" value="Login" />
       </div>
-    
-      <a href="/register">Register</a>
-    </form>    
+    </form>
+    <a href="/register">Register</a>
   </body>
 </html>

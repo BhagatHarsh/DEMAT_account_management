@@ -8,13 +8,42 @@
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Dashboard</title>
+    <title>Login</title>
   </head>
   <body>
-    <h1>Dashboard</h1>
-
-    <a href="/users/logout">Logout</a>
-
-    <h4>Hello <%= user %></h4>
+    <h1>Login</h1>
+    <% if (message) { %>
+      <p><%= message %></p>
+    <% } %>
+    <form action="/login" method="POST">
+      <div>
+        <input
+          type="text"
+          id="pan"
+          name="pan_number"
+          placeholder="PAN"
+          required
+          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+          oninvalid="this.setCustomValidity('Please enter a valid PAN number')"
+          onchange="this.setCustomValidity('')"
+        />
+      </div>
+      <div>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          required
+          pattern=".{8,}"
+          oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')"
+          onchange="this.setCustomValidity('')"
+        />
+      </div>
+      <div>
+        <input type="submit" value="Login" />
+      </div>
+    </form>
+    <a href="/register">Register</a>
   </body>
 </html>
