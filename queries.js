@@ -1,9 +1,10 @@
 // Import required modules
 const { pool } = require("./dbConfig");
 const bcrypt = require('bcrypt');
+const dematgen = require('./utils/dematgen')
 
 // Function to retrieve all users from the database
-const getUsers = () => {
+const getAllUserData = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await pool.query('SELECT * FROM users');
@@ -15,31 +16,126 @@ const getUsers = () => {
   });
 };
 
-// Function to register a new user in the database
-const registerUser = (data) => {
+const getAllDematData = () => {
   return new Promise((resolve, reject) => {
-    // Hash the user's password before storing it in the database
-    bcrypt.hash(data.password, 10, (err, hash) => {
+    const query = 'SELECT * FROM demat';
+
+    pool.query(query, (err, res) => {
       if (err) {
         reject(err);
       } else {
-        // SQL query with parameterized placeholders
-        const query = 'INSERT INTO users (pan_number, pincode, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5)';
-        // Array of parameter values to be passed to the query
-        const values = [data.pan_number, data.pincode, hash, data.first_name, data.last_name];
-
-        // Execute the query with the parameter values
-        pool.query(query, values, (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve('Data inserted successfully');
-          }
-        });
+        resolve(res.rows);
       }
     });
   });
 };
+
+const getUserData = (pan_number) => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM users WHERE pan_number = $1';
+    pool.query(query, [pan_number], (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result.rows[0]);
+      }
+    });
+  });
+};
+
+const getDematData = (pan_number) => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT demat_id FROM demat WHERE pan_number = $1';
+    pool.query(query, [pan_number], (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result.rows[0]);
+      }
+    });
+  });
+};
+
+const getAllPhoneNumberData = () => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM phone_number';
+
+    pool.query(query, (err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(res.rows);
+      }
+    });
+  });
+};
+
+const getAllBankDetailsData = () => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM demat_details';
+
+    pool.query(query, (err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(res.rows);
+      }
+    });
+  });
+};
+
+const getBankDetailsByIFSC = (ifsc_code) => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM banks WHERE ifsc_code = $1';
+    pool.query(query, [ifsc_code], (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result.rows[0]);
+      }
+    });
+  });
+};
+
+
+const registerUser = async (data) => {
+  try {
+    // Hash the user's password before storing it in the database
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    // Insert the user's registration data into the users table
+    const insertUserQuery = 'INSERT INTO users (pan_number, pincode, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5)';
+    const insertUserValues = [data.pan_number, data.pincode, hashedPassword, data.first_name, data.last_name];
+    await pool.query(insertUserQuery, insertUserValues);
+
+    // Insert phone number data into the phone_number table
+    const insertPhoneQuery = 'INSERT INTO phone_number (pan_number, phone_number) VALUES ($1, $2)';
+    const insertPhoneValues = [data.pan_number, data.phone_number];
+    await pool.query(insertPhoneQuery, insertPhoneValues);
+
+    // Insert bank data into the banks table
+    const insertBankQuery = 'INSERT INTO banks (bank_name, ifsc_code) VALUES ($1, $2)';
+    const insertBankValues = [data.bank_name, data.ifsc_code];
+    await pool.query(insertBankQuery, insertBankValues);
+
+    // Insert demat data into the demat table
+    const dematID = dematgen.generateDematID();
+    const insertDematQuery = 'INSERT INTO demat (demat_id, pan_number) VALUES ($1, $2)';
+    const insertDematValues = [dematID, data.pan_number];
+    await pool.query(insertDematQuery, insertDematValues);
+
+    // Insert demat details into the demat_details table
+    const insertDematDetailsQuery = 'INSERT INTO demat_details (demat_id, account_number, ifsc_code) VALUES ($1, $2, $3)';
+    const insertDematDetailsValues = [dematID, data.account_number, data.ifsc_code];
+    await pool.query(insertDematDetailsQuery, insertDematDetailsValues);
+
+    // Return the Demat ID to be displayed to the user
+    return dematID;
+  } catch (err) {
+    throw err;
+  }
+};
+
 
 // Function to log in a user
 const loginUser = (data) => {
@@ -85,11 +181,53 @@ const getUserById = (userId) => {
   });
 };
 
+const resetDatabase = async () => {
+  try {
+    const tables = [
+      'banks',
+      'broker',
+      'broker_exchange',
+      'broker_phoneno',
+      'companies',
+      'demat',
+      'demat_broker',
+      'demat_details',
+      'exchanges',
+      'listing',
+      'mf_purchased',
+      'mutual_fund_invest',
+      'mutual_funds',
+      'phone_number',
+      'share_purchased',
+      'users',
+      'users_broker'
+    ];
+
+    for (let i = 0; i < tables.length; i++) {
+      const query = `DELETE FROM ${tables[i]}`;
+      await pool.query(query);
+    }
+
+    console.log('All data has been deleted from the database');
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+
 
 // Export the functions for use in other modules
 module.exports = {
-  getUsers,
+  getAllUserData,
+  getAllDematData,
   registerUser,
   loginUser,
-  getUserById
+  getUserById,
+  getUserData, 
+  getDematData,
+  getAllBankDetailsData,
+  getAllPhoneNumberData,
+  resetDatabase,
+  getBankDetailsByIFSC
 };
