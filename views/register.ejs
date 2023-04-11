@@ -18,17 +18,53 @@
       <li><%= error.message %></li>
       <% }) %> <% } %>
     </ul>
-    <form action="/users/register" method="POST">
+    <form action="/register" method="POST">
       <div>
-        <input type="text" id="name" name="name" placeholder="Name" required />
+        <input
+          type="text"
+          id="pan"
+          name="pan_number"
+          placeholder="PAN"
+          required
+          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+          oninvalid="this.setCustomValidity('Please enter a valid PAN number')"
+          onchange="this.setCustomValidity('')"
+        />
       </div>
       <div>
         <input
           type="text"
-          id="email"
-          name="DematID"
-          placeholder="DematID"
+          id="first_name"
+          name="first_name"
+          placeholder="First Name"
           required
+          pattern="[a-zA-Z]+"
+          oninvalid="this.setCustomValidity('Please enter a valid first name')"
+          onchange="this.setCustomValidity('')"
+        />
+      </div>
+      <div>
+        <input
+          type="text"
+          id="last_name"
+          name="last_name"
+          placeholder="Last Name"
+          required
+          pattern="[a-zA-Z]+"
+          oninvalid="this.setCustomValidity('Please enter a valid last name')"
+          onchange="this.setCustomValidity('')"
+        />
+      </div>
+      <div>
+        <input
+          type="text"
+          id="pincode"
+          name="pincode"
+          placeholder="Pincode"
+          required
+          pattern="[0-9]{6}"
+          oninvalid="this.setCustomValidity('Please enter a valid 6-digit pincode')"
+          onchange="this.setCustomValidity('')"
         />
       </div>
       <div>
@@ -38,6 +74,9 @@
           name="password"
           placeholder="Password"
           required
+          pattern=".{8,}"
+          oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')"
+          onchange="this.setCustomValidity('')"
         />
       </div>
       <div>
@@ -47,13 +86,16 @@
           name="password2"
           placeholder="Confirm Password"
           required
+          pattern=".{8,}"
+          oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')"
+          onchange="this.setCustomValidity('')"
         />
       </div>
       <div>
         <input type="submit" value="Register" />
       </div>
-
-      <a href="/users/login">Already registered? Login here</a>
-    </form>
+    
+      <a href="/login">Already registered? Login here</a>
+    </form>    
   </body>
 </html>
