@@ -16,6 +16,20 @@ const getAllUserData = () => {
   });
 };
 
+const getAllBanksData = () => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM banks';
+    pool.query(query, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result.rows);
+      }
+    });
+  });
+};
+
+
 const getAllDematData = () => {
   return new Promise((resolve, reject) => {
     const query = 'SELECT * FROM demat';
@@ -137,25 +151,16 @@ const registerUser = async (data) => {
 };
 
 
-// Function to log in a user
-const loginUser = (data) => {
+// Function to get user by demat_id
+const getUserByDematId = (demat_id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = await pool.query('SELECT * FROM users WHERE pan_number = $1', [data.pan_number]);
+      const result = await pool.query('SELECT * FROM users WHERE PAN_Number IN (SELECT PAN_Number FROM demat WHERE Demat_ID = $1)', [demat_id]);
 
       if (result.rows.length === 0) {
         reject('User not found');
       } else {
-        bcrypt.compare(data.password, result.rows[0].password, (err, isMatch) => {
-          if (err) {
-            reject(err);
-          } else if (!isMatch) {
-            reject('Incorrect password');
-          } else {
-            // Return the user's ID along with the success message
-            resolve({ message: 'Login successful', userId: result.rows[0].id });
-          }
-        });
+        resolve(result.rows[0]);
       }
     } catch (err) {
       console.error(err);
@@ -163,6 +168,7 @@ const loginUser = (data) => {
     }
   });
 };
+
 
 const getUserById = (userId) => {
   return new Promise(async (resolve, reject) => {
@@ -184,23 +190,22 @@ const getUserById = (userId) => {
 const resetDatabase = async () => {
   try {
     const tables = [
-      'banks',
-      'broker',
-      'broker_exchange',
-      'broker_phoneno',
-      'companies',
-      'demat',
-      'demat_broker',
-      'demat_details',
-      'exchanges',
-      'listing',
-      'mf_purchased',
-      'mutual_fund_invest',
-      'mutual_funds',
-      'phone_number',
+      'users_broker',
       'share_purchased',
-      'users',
-      'users_broker'
+      'phone_number',
+      'mutual_fund_invest',
+      'mf_purchased',
+      'listing',
+      'exchanges',
+      'demat_details',
+      'demat_broker',
+      'demat',
+      'companies',
+      'broker_phoneno',
+      'broker_exchange',
+      'broker',
+      'banks',
+      'users'
     ];
 
     for (let i = 0; i < tables.length; i++) {
@@ -217,17 +222,19 @@ const resetDatabase = async () => {
 
 
 
+
 // Export the functions for use in other modules
 module.exports = {
   getAllUserData,
   getAllDematData,
   registerUser,
-  loginUser,
   getUserById,
   getUserData, 
   getDematData,
   getAllBankDetailsData,
   getAllPhoneNumberData,
   resetDatabase,
-  getBankDetailsByIFSC
+  getBankDetailsByIFSC,
+  getAllBanksData,
+  getUserByDematId
 };

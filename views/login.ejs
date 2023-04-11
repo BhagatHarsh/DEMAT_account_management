@@ -11,22 +11,18 @@
     <title>Login</title>
   </head>
   <body>
-    <h1>Login</h1>
-    <% if (message) { %>
-      <p><%= message %></p>
-    <% } %>
     <form action="/login" method="POST">
       <div>
         <input
-          type="text"
-          id="pan"
-          name="pan_number"
-          placeholder="PAN"
-          required
-          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
-          oninvalid="this.setCustomValidity('Please enter a valid PAN number')"
-          onchange="this.setCustomValidity('')"
-        />
+      type="text"
+      id="Demat"
+      name="demat_id"
+      placeholder="DEMAT"
+      required
+      pattern="[A-Z0-9]{10}"
+      oninvalid="this.setCustomValidity('Please enter a valid DEMAT ID')"
+      onchange="this.setCustomValidity('')"
+    />
       </div>
       <div>
         <input
@@ -44,6 +40,6 @@
         <input type="submit" value="Login" />
       </div>
     </form>
-    <a href="/register">Register</a>
+    <a href="/login">Register</a>
   </body>
 </html>

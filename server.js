@@ -1,9 +1,10 @@
 const express = require('express')
 const app = express()
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser')
 const port = 3000
 const query = require('./queries')
 const path = require('path')
+const bcrypt = require('bcrypt')
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
@@ -15,92 +16,32 @@ app.engine('ejs', require('ejs').__express);
 
 
 //get requests
-app.get('/', (req, res) => {
-  res.render( __dirname + '/views/register.ejs')
-})
-
-app.get('/login',(req, res) => {
+app.get('/login', (req, res) => {
   res.render( __dirname + '/views/login.ejs')
 })
 
-app.get('/data', async (req, res) => {
-  try {
-    const allUserData = await query.getAllUserData();
-    const allDematData = await query.getAllDematData();
-    const allPhoneNumberData = await query.getAllPhoneNumberData();
-    const allBankDetailsData = await query.getAllBankDetailsData();
-
-    // merge data from all tables
-    const data = allUserData.map(async user => {
-      const demat = allDematData.find(d => d.pan_number === user.pan_number);
-      const phoneNumberData = allPhoneNumberData.find(p => p.pan_number === user.pan_number);
-      const bankDetailsData = allBankDetailsData.find(b => b.ifsc_code === phoneNumberData.ifsc_code);
-
-      // If bank details not found, retrieve them from the database
-      if (!bankDetailsData) {
-        const bank = await query.getBankDetailsByIFSC(phoneNumberData.ifsc_code);
-        console.log("bank" + bank)
-        bankDetailsData = {
-          ifsc_code: bank.ifsc_code,
-          bank_name: bank.bank_name,
-          account_number: null // Update this with your default value for account number
-        };
-      }
-
-      return {
-        pan_number: user.pan_number,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        pincode: user.pincode,
-        phone_number: phoneNumberData.phone_number,
-        ifsc_code: phoneNumberData.ifsc_code,
-        bank_name: bankDetailsData.bank_name,
-        account_number: bankDetailsData.account_number,
-        demat_id: demat ? demat.demat_id : null
-      };
-    });
-
-    res.render(__dirname + '/views/data.ejs', { data });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('An error occurred while retrieving user data');
-  }
-});
-
-
-app.get('/reset',(req, res) => {
-  query.resetDatabase();
+app.get('/register',(req, res) => {
   res.render( __dirname + '/views/register.ejs')
 })
 
+app.get('/reset',(req, res) => {
+  query.resetDatabase();
+  res.redirect( '/register')
+})
 
 app.get('/dashboard/:id', async (req, res) => {
   try {
     // Get the user ID from the request parameters
     const userId = req.params.id;
-
     // Get the user from the database based on the user ID
-    const data = await query.getUserById(userId);
-
+    const data = await query.getUserByDematId(userId);
     // Render the dashboard page with the user's information
-    res.render(__dirname + '/views/dashboard.ejs', { user: data.first_name });
+    res.render(__dirname + '/views/dashboard.ejs', { data, demat_id:userId });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving user information');
   }
 });
-
-// app.get('/demat/:id', function(req, res) {
-//   // Retrieve user's Demat account information from the database
-//   var pan_number = req.params.id; // assuming the PAN number is stored in the session object
-//   // Use the PAN number to query the database and retrieve the user's Demat account information
-
-//   // Pass the user's Demat account information to the demat.ejs template
-//   res.render('demat', { demat_info: demat_info });
-// });
-
-
-
 
 //post requests
 app.post('/register', async (req, res) => {
@@ -120,14 +61,21 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Route for user login
 app.post('/login', async (req, res) => {
   try {
-    const { pan_number, password } = req.body;
+    const { demat_id, password } = req.body;
 
-    const result = await loginUser({ pan_number, password });
-
-    // Redirect the user to their specific page using their ID
-    res.redirect(`/users/${result.pan_number}`);
+    const user = await query.getUserByDematId(demat_id);
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err) {
+        res.status(401).send('Invalid login credentials');
+      } else if (!isMatch) {
+        res.status(401).send('Invalid login credentials');
+      } else {
+        res.redirect(`/dashboard/${demat_id}`);
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(401).send('Invalid login credentials');

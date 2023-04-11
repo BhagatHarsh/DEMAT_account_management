@@ -1,49 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css"
-    />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Login</title>
+    <title>Dashboard</title>
   </head>
   <body>
-    <h1>Login</h1>
-    <% if (message) { %>
-      <p><%= message %></p>
-    <% } %>
-    <form action="/login" method="POST">
-      <div>
-        <input
-          type="text"
-          id="pan"
-          name="pan_number"
-          placeholder="PAN"
-          required
-          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
-          oninvalid="this.setCustomValidity('Please enter a valid PAN number')"
-          onchange="this.setCustomValidity('')"
-        />
-      </div>
-      <div>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Password"
-          required
-          pattern=".{8,}"
-          oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')"
-          onchange="this.setCustomValidity('')"
-        />
-      </div>
-      <div>
-        <input type="submit" value="Login" />
-      </div>
-    </form>
-    <a href="/register">Register</a>
+    <h1>Welcome, <%= data.first_name %> <%= data.last_name %>!</h1>
+    <p>PAN Number: <%= data.pan_number %></p>
+    <p>Pincode: <%= data.pincode %></p>
+    <p>DEMAT ID: <%= demat_id %></p>
   </body>
 </html>
