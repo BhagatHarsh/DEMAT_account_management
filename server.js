@@ -57,7 +57,7 @@ app.post('/register', async (req, res) => {
     if(role === "trader"){
       try {
         const dematID = await query.registerTrader(req.body);
-        res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+        res.render(__dirname + '/views/trader_page1.ejs', { dematID:dematID });
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
