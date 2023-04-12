@@ -51,8 +51,7 @@ app.get('/dashboard', async (req, res) => {
 
 //post requests
 app.post('/register', async (req, res) => {
-  const role = req.query.role;
-  console.log(role)
+  const role = req.body.role;
   console.log(req.body);
   if(role){
     if(role === "trader"){
@@ -83,19 +82,6 @@ app.post('/register', async (req, res) => {
         res.redirect('/register')
       }
     }
-  }
-  if(req.body){
-    try {
-      const dematID = await query.registerUser(req.body);
-      res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error inserting user data');
-      res.redirect('/register')
-    }
-  }else{
-    res.status(500).send('Data not recieved');
-    res.redirect('/register')
   }
 });
 
