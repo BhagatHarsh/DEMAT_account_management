@@ -56,8 +56,8 @@ app.post('/register', async (req, res) => {
   if(role){
     if(role === "trader"){
       try {
-        const dematID = await query.registerTrader(req.body);
-        res.render(__dirname + '/views/trader_page1.ejs', { dematID:dematID });
+        const data = await query.registerTrader(req.body);
+        res.render(__dirname + '/views/trader_page1.ejs', { dematID: data.demat_id });
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
@@ -65,8 +65,9 @@ app.post('/register', async (req, res) => {
       }
     }else if(role === "company"){
       try {
-        const dematID = await query.registerCompany(req.body);
-        res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+        const data = await query.registerCompany(req.body);
+        // res.redirect(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+        res.send(data)
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
@@ -87,24 +88,69 @@ app.post('/register', async (req, res) => {
 
 // Route for user login
 app.post('/login', async (req, res) => {
-  try {
-    const { demat_id, password } = req.body;
-
-    const user = await query.getUserByDematId(demat_id);
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) {
+  const role = req.body.role;
+  console.log(req.body);
+  if (role) {
+    if (role === "trader") {
+      try {
+        const { pan_number, password } = req.body;
+        const user = await query.getTraderByPanNumber(pan_number);
+        bcrypt.compare(password, user.password, (err, isMatch) => {
+          if (err) {
+            res.status(401).send('Invalid login credentials');
+          } else if (!isMatch) {
+            res.status(401).send('Invalid login credentials');
+          } else {
+            res.redirect(`/trader?id=${pan_number}`);
+          }
+        });
+      } catch (err) {
+        console.error(err);
         res.status(401).send('Invalid login credentials');
-      } else if (!isMatch) {
-        res.status(401).send('Invalid login credentials');
-      } else {
-        res.redirect(`/dashboard?id=${demat_id}`);
       }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(401).send('Invalid login credentials');
+    } else if (role === "company") {
+      try {
+        const { gst_number, password } = req.body;
+        const company = await query.getCompanyByGstNumber(gst_number);
+        console.log("company", company)
+        bcrypt.compare(password, company.password, (err, isMatch) => {
+          if (err) {
+            res.status(401).send('Invalid login credentials');
+          } else if (!isMatch) {
+            res.status(401).send('Invalid login credentials');
+          } else {
+            res.redirect(`/company?id=${company.symbol}`);
+          }
+        });
+      } catch (err) {
+        console.error(err);
+        res.status(401).send('Invalid login credentials');
+      }
+    } else if (role === "broker") {
+      try {
+        const { broker_id, password } = req.body;
+        const broker = await query.getBrokerById(broker_id);
+        bcrypt.compare(password, broker.password, (err, isMatch) => {
+          if (err) {
+            res.status(401).send('Invalid login credentials');
+          } else if (!isMatch) {
+            res.status(401).send('Invalid login credentials');
+          } else {
+            res.redirect(`/broker?id=${broker_id}`);
+          }
+        });
+      } catch (err) {
+        console.error(err);
+        res.status(401).send('Invalid login credentials');
+      }
+    } else {
+      res.status(400).send('Invalid role');
+    }
+  } else {
+    res.status(400).send('Role is required');
   }
 });
+
 
 app.get('/',(req, res) => {
   res.render(__dirname + '/views/controller.ejs')

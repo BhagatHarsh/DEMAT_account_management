@@ -3,113 +3,52 @@ const { pool } = require("./dbConfig");
 const bcrypt = require('bcrypt');
 const dematgen = require('./utils/dematgen')
 
-// Function to retrieve all users from the database
-const getAllUserData = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const result = await pool.query('SELECT * FROM users');
-      resolve(result.rows);
-    } catch (err) {
-      console.error(err);
-      reject('Error retrieving users from database');
+const getUserByDematId = async (demat_id) => {
+  try {
+    // Get the user's data from the users and demat tables using a join query
+    const queryText = 'SELECT u.pan_number, u.first_name, u.last_name, u.pincode, d.demat_id FROM users u JOIN demat d ON u.pan_number = d.pan_number WHERE d.demat_id = $1';
+    const result = await pool.query(queryText, [demat_id]);
+
+    // If no user data is found, throw an error
+    if (result.rows.length === 0) {
+      throw new Error('User not found');
     }
-  });
-};
 
-const getAllBanksData = () => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM banks';
-    pool.query(query, (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result.rows);
-      }
-    });
-  });
+    // Return the user data
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
 };
 
 
-const getAllDematData = () => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM demat';
+const getTraderByPanNumber = async (pan_number) => {
+  try {
+    // Query to retrieve user data from the users table
+    const userQuery = 'SELECT * FROM users WHERE pan_number = $1';
+    const userValues = [pan_number];
+    const userResult = await pool.query(userQuery, userValues);
 
-    pool.query(query, (err, res) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(res.rows);
-      }
-    });
-  });
+    // Query to retrieve demat data from the demat table
+    const dematQuery = 'SELECT * FROM demat WHERE pan_number = $1';
+    const dematValues = [pan_number];
+    const dematResult = await pool.query(dematQuery, dematValues);
+
+    // Combine the user and demat data
+    const data = {
+      first_name: userResult.rows[0].first_name,
+      last_name: userResult.rows[0].last_name,
+      pan_number: userResult.rows[0].pan_number,
+      pincode: userResult.rows[0].pincode,
+      demat_id: dematResult.rows[0].demat_id
+    };
+
+    return data;
+  } catch (err) {
+    throw err;
+  }
 };
 
-const getUserData = (pan_number) => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM users WHERE pan_number = $1';
-    pool.query(query, [pan_number], (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result.rows[0]);
-      }
-    });
-  });
-};
-
-const getDematData = (pan_number) => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT demat_id FROM demat WHERE pan_number = $1';
-    pool.query(query, [pan_number], (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result.rows[0]);
-      }
-    });
-  });
-};
-
-const getAllPhoneNumberData = () => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM phone_number';
-
-    pool.query(query, (err, res) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(res.rows);
-      }
-    });
-  });
-};
-
-const getAllBankDetailsData = () => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM demat_details';
-
-    pool.query(query, (err, res) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(res.rows);
-      }
-    });
-  });
-};
-
-const getBankDetailsByIFSC = (ifsc_code) => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM banks WHERE ifsc_code = $1';
-    pool.query(query, [ifsc_code], (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result.rows[0]);
-      }
-    });
-  });
-};
 
 const registerTrader = async (data) => {
   try {
@@ -143,16 +82,18 @@ const registerTrader = async (data) => {
     await pool.query(insertDematDetailsQuery, insertDematDetailsValues);
 
     // Return the Demat ID to be displayed to the user
-    return dematID;
+    data.demat_id = dematID
+    return data;
   } catch (err) {
     throw err;
   }
 };
 
-
-
 const registerCompany = async (data) => {
   try {
+    // Hash the company's password before storing it in the database
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
     // Insert company data into the Companies table
     const insertCompanyQuery = 'INSERT INTO Companies (Symbol, Company_name) VALUES ($1, $2)';
     const insertCompanyValues = [data.company_symbol, data.company_name];
@@ -160,7 +101,7 @@ const registerCompany = async (data) => {
 
     // Insert company info data into the Company_info table
     const insertCompanyInfoQuery = 'INSERT INTO Company_info (GST_Number, password, Symbol) VALUES ($1, $2, $3)';
-    const insertCompanyInfoValues = [data.gst_number, data.password, data.company_symbol];
+    const insertCompanyInfoValues = [data.gst_number, hashedPassword, data.company_symbol];
     await pool.query(insertCompanyInfoQuery, insertCompanyInfoValues);
 
     // Return the company symbol to be displayed to the user
@@ -170,42 +111,18 @@ const registerCompany = async (data) => {
   }
 };
 
-
-// Function to get user by demat_id
-const getUserByDematId = (demat_id) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const result = await pool.query('SELECT * FROM users WHERE pan_number IN (SELECT pan_number FROM demat WHERE demat_id = $1)', [demat_id]);
-
-      if (result.rows.length === 0) {
-        reject('User not found');
-      } else {
-        resolve(result.rows[0]);
-      }
-    } catch (err) {
-      console.error(err);
-      reject('Error retrieving user from database');
-    }
-  });
+const getCompanyByGstNumber = async (gstNumber) => {
+  try {
+    const queryText = 'SELECT * FROM company_info WHERE gst_number = $1';
+    const queryValues = [gstNumber];
+    const { rows } = await pool.query(queryText, queryValues);
+    return rows[0];
+  } catch (err) {
+    throw err;
+  }
 };
 
 
-const getUserById = (userId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const result = await pool.query('SELECT * FROM users WHERE pan_number = $1', [userId]);
-
-      if (result.rows.length === 0) {
-        reject('User not found');
-      } else {
-        resolve(result.rows[0]);
-      }
-    } catch (err) {
-      console.error(err);
-      reject('Error retrieving user from database');
-    }
-  });
-};
 
 const resetDatabase = async () => {
   try {
@@ -245,17 +162,10 @@ const resetDatabase = async () => {
 
 // Export the functions for use in other modules
 module.exports = {
-  getAllUserData,
-  getAllDematData,
   registerTrader,
-  getUserById,
-  getUserData, 
-  getDematData,
-  getAllBankDetailsData,
-  getAllPhoneNumberData,
   resetDatabase,
-  getBankDetailsByIFSC,
-  getAllBanksData,
+  registerCompany,
+  getTraderByPanNumber,
   getUserByDematId,
-  registerCompany
+  getCompanyByGstNumber
 };
