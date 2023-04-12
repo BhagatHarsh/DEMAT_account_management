@@ -112,7 +112,7 @@ const getBankDetailsByIFSC = (ifsc_code) => {
 };
 
 
-const registerUser = async (data) => {
+const registerTrader = async (data) => {
   try {
     // Hash the user's password before storing it in the database
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -200,6 +200,7 @@ const resetDatabase = async () => {
       'demat_details',
       'demat_broker',
       'demat',
+      'company_info',
       'companies',
       'broker_phoneno',
       'broker_exchange',
@@ -227,7 +228,7 @@ const resetDatabase = async () => {
 module.exports = {
   getAllUserData,
   getAllDematData,
-  registerUser,
+  registerTrader,
   getUserById,
   getUserData, 
   getDematData,

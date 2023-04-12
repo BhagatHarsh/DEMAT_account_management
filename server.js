@@ -34,12 +34,13 @@ app.get('/reset',(req, res) => {
   res.redirect( '/register')
 })
 
-app.get('/dashboard/:id', async (req, res) => {
+app.get('/dashboard', async (req, res) => {
   try {
     // Get the user ID from the request parameters
-    const userId = req.params.id;
+    const userId = req.query.id;
     // Get the user from the database based on the user ID
     const data = await query.getUserByDematId(userId);
+    console.log(data)
     // Render the dashboard page with the user's information
     res.render(__dirname + '/views/dashboard.ejs', { data, demat_id:userId });
   } catch (err) {
@@ -53,6 +54,36 @@ app.post('/register', async (req, res) => {
   const role = req.query.role;
   console.log(role)
   console.log(req.body);
+  if(role){
+    if(role === "trader"){
+      try {
+        const dematID = await query.registerTrader(req.body);
+        res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Error inserting user data');
+        res.redirect('/register')
+      }
+    }else if(role === "company"){
+      try {
+        const dematID = await query.registerCompany(req.body);
+        res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Error inserting user data');
+        res.redirect('/register')
+      }
+    }else if(role === "broker"){
+      try {
+        const dematID = await query.registerBroker(req.body);
+        res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Error inserting user data');
+        res.redirect('/register')
+      }
+    }
+  }
   if(req.body){
     try {
       const dematID = await query.registerUser(req.body);
@@ -80,7 +111,7 @@ app.post('/login', async (req, res) => {
       } else if (!isMatch) {
         res.status(401).send('Invalid login credentials');
       } else {
-        res.redirect(`/dashboard/${demat_id}`);
+        res.redirect(`/dashboard?id=${demat_id}`);
       }
     });
   } catch (err) {
@@ -95,4 +126,5 @@ app.get('/',(req, res) => {
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
+  console.log(`http://localhost:${port}`)
 })
