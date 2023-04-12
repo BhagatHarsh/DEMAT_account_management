@@ -31,7 +31,7 @@ app.get('/register',(req, res) => {
 
 app.get('/reset',(req, res) => {
   query.resetDatabase();
-  res.redirect( '/register')
+  res.redirect( '/')
 })
 
 app.get('/dashboard', async (req, res) => {
@@ -61,7 +61,7 @@ app.post('/register', async (req, res) => {
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
-        res.redirect('/register')
+        res.redirect('/register?role=trader')
       }
     }else if(role === "company"){
       try {
@@ -70,7 +70,7 @@ app.post('/register', async (req, res) => {
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
-        res.redirect('/register')
+        res.redirect('/register?role=company')
       }
     }else if(role === "broker"){
       try {
@@ -79,7 +79,7 @@ app.post('/register', async (req, res) => {
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
-        res.redirect('/register')
+        res.redirect('/register?role=broker')
       }
     }
   }

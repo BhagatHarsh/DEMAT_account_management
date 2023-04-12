@@ -111,15 +111,14 @@ const getBankDetailsByIFSC = (ifsc_code) => {
   });
 };
 
-
 const registerTrader = async (data) => {
   try {
     // Hash the user's password before storing it in the database
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedpassword = await bcrypt.hash(data.password, 10);
 
     // Insert the user's registration data into the users table
-    const insertUserQuery = 'INSERT INTO users (pan_number, pincode, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5)';
-    const insertUserValues = [data.pan_number, data.pincode, hashedPassword, data.first_name, data.last_name];
+    const insertUserQuery = 'INSERT INTO users (pan_number, first_name, last_name, ifsc_code, pincode, password) VALUES ($1, $2, $3, $4, $5, $6)';
+    const insertUserValues = [data.pan_number, data.first_name, data.last_name, data.ifsc_code, data.pincode, hashedpassword];
     await pool.query(insertUserQuery, insertUserValues);
 
     // Insert phone number data into the phone_number table
@@ -127,19 +126,19 @@ const registerTrader = async (data) => {
     const insertPhoneValues = [data.pan_number, data.phone_number];
     await pool.query(insertPhoneQuery, insertPhoneValues);
 
-    // Insert bank data into the banks table
-    const insertBankQuery = 'INSERT INTO banks (bank_name, ifsc_code) VALUES ($1, $2)';
+    // Insert bank data into the Banks table
+    const insertBankQuery = 'INSERT INTO Banks (bank_name, ifsc_code) VALUES ($1, $2)';
     const insertBankValues = [data.bank_name, data.ifsc_code];
     await pool.query(insertBankQuery, insertBankValues);
 
-    // Insert demat data into the demat table
+    // Insert demat data into the Demat table
     const dematID = dematgen.generateDematID();
-    const insertDematQuery = 'INSERT INTO demat (demat_id, pan_number) VALUES ($1, $2)';
+    const insertDematQuery = 'INSERT INTO Demat (demat_id, pan_number) VALUES ($1, $2)';
     const insertDematValues = [dematID, data.pan_number];
     await pool.query(insertDematQuery, insertDematValues);
 
-    // Insert demat details into the demat_details table
-    const insertDematDetailsQuery = 'INSERT INTO demat_details (demat_id, account_number, ifsc_code) VALUES ($1, $2, $3)';
+    // Insert demat details into the Demat_details table
+    const insertDematDetailsQuery = 'INSERT INTO Demat_details (demat_id, account_number, ifsc_code) VALUES ($1, $2, $3)';
     const insertDematDetailsValues = [dematID, data.account_number, data.ifsc_code];
     await pool.query(insertDematDetailsQuery, insertDematDetailsValues);
 
@@ -151,11 +150,32 @@ const registerTrader = async (data) => {
 };
 
 
+
+const registerCompany = async (data) => {
+  try {
+    // Insert company data into the Companies table
+    const insertCompanyQuery = 'INSERT INTO Companies (Symbol, Company_name) VALUES ($1, $2)';
+    const insertCompanyValues = [data.company_symbol, data.company_name];
+    await pool.query(insertCompanyQuery, insertCompanyValues);
+
+    // Insert company info data into the Company_info table
+    const insertCompanyInfoQuery = 'INSERT INTO Company_info (GST_Number, password, Symbol) VALUES ($1, $2, $3)';
+    const insertCompanyInfoValues = [data.gst_number, data.password, data.company_symbol];
+    await pool.query(insertCompanyInfoQuery, insertCompanyInfoValues);
+
+    // Return the company symbol to be displayed to the user
+    return data.company_symbol;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 // Function to get user by demat_id
 const getUserByDematId = (demat_id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = await pool.query('SELECT * FROM users WHERE PAN_Number IN (SELECT PAN_Number FROM demat WHERE Demat_ID = $1)', [demat_id]);
+      const result = await pool.query('SELECT * FROM users WHERE pan_number IN (SELECT pan_number FROM demat WHERE demat_id = $1)', [demat_id]);
 
       if (result.rows.length === 0) {
         reject('User not found');
@@ -236,5 +256,6 @@ module.exports = {
   resetDatabase,
   getBankDetailsByIFSC,
   getAllBanksData,
-  getUserByDematId
+  getUserByDematId,
+  registerCompany
 };
