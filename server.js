@@ -24,7 +24,9 @@ app.get('/login', (req, res) => {
 
 
 app.get('/register',(req, res) => {
-  res.render( __dirname + '/views/register.ejs')
+  const role = req.query.role;
+  console.log(role)
+  res.render(__dirname + `/views/register_${role}`)
 })
 
 app.get('/reset',(req, res) => {
@@ -48,6 +50,8 @@ app.get('/dashboard/:id', async (req, res) => {
 
 //post requests
 app.post('/register', async (req, res) => {
+  const role = req.query.role;
+  console.log(role)
   console.log(req.body);
   if(req.body){
     try {
@@ -86,7 +90,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/',(req, res) => {
-  res.render(__dirname + '/views/register_company.ejs')
+  res.render(__dirname + '/views/controller.ejs')
 })
 
 app.listen(port, () => {
