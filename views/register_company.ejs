@@ -16,8 +16,18 @@
   <link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
   <link rel="stylesheet" type="text/css" href="css/util.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
-
+<style>#symbol {
+  position: fixed;
+  top: 30px;
+    right: 525px;
+  padding: 10px;
+  font-size: 44px;
+  color: #f5f6f8;
+  background-color: #f387e8;
+}
+</style>
 <body>
   <div class="limiter">
     <div class="container-login100" style="background-image: url('images/bg-01.jpg');">
@@ -30,6 +40,10 @@
           <span class="login100-form-title p-b-34 p-t-27">
             Register
           </span>
+
+          <div class="home-icon" id="symbol">
+						<a href="/"><i class="fas fa-home"></i></a>
+					</div>
 
           <div class="wrap-input100 validate-input" data-validate="Enter Company Name">
             <input class="input100" type="text" name="company_name" placeholder="Company Name" required pattern="[a-zA-Z\s]+" 

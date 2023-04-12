@@ -25,9 +25,22 @@
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="css/util.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-pVHJXFL8y+pqI2o2+hr5g14jJHlY7ItQaTJhC+xn16XlE1aVpJtKsBo/NxsxGtHWW3g3K3YvSW1pDfTtI9KjRA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 <!--===============================================================================================-->
 </head>
 <body>
+
+	<style>#symbol {
+		position: fixed;
+		top: 30px;
+  		right: 525px;
+		padding: 10px;
+		font-size: 44px;
+		color: #f5f6f8;
+		background-color: #f387e8;
+	}
+	</style>
 	
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');">
@@ -41,10 +54,17 @@
 						Log in
 					</span>
 
-					<div class="wrap-input100 validate-input" data-validate = "Enter GST_Number">
-						<input class="input100" type="text" name="GST_Number" placeholder="GST_Number" required pattern="[A-Z0-9]{10}" oninvalid="this.setCustomValidity('Please enter a valid GST_Number')" onchange="this.setCustomValidity('')">
-						<span class="focus-input100" data-placeholder="&#xf207;"></span>
+					<div class="home-icon" id="symbol">
+						<a href="/"><i class="fas fa-home"></i></a>
 					</div>
+					 
+					
+					<div class="wrap-input100 validate-input" data-validate="Enter GST_Number">
+						<input class="input100" type="text" name="GST_Number" placeholder="GST Number" required
+						  pattern="[A-Z]{4}[0][A-Z0-9]{6}" oninvalid="this.setCustomValidity('Please enter a valid GST Number')"
+						  onchange="this.setCustomValidity('')">
+						<span class="focus-input100" data-placeholder="&#xf155;"></span>
+					  </div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
 						<input class="input100" type="password" name="password" placeholder="Password" required pattern=".{8,}" oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')" onchange="this.setCustomValidity('')">
@@ -62,7 +82,7 @@
 					<p class="txt1">
 						Do not have an account?
 					</p>
-					<a href="/register"><button class="btn btn-secondary">Register Now</button></a>
+					<a href="/register?role=company"><button class="btn btn-secondary">Register Now</button></a>
 				</div>
 			</div>
 		</div>

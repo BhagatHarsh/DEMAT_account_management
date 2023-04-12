@@ -25,9 +25,20 @@
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="css/util.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 <!--===============================================================================================-->
 </head>
 <body>
+	<style>#symbol {
+		position: fixed;
+		top: 30px;
+  		right: 525px;
+		padding: 10px;
+		font-size: 44px;
+		color: #f5f6f8;
+		background-color: #f387e8;
+	}
+	</style>
 	
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');">
@@ -40,6 +51,9 @@
 					<span class="login100-form-title p-b-34 p-t-27">
 						Log in
 					</span>
+					<div class="home-icon" id="symbol">
+						<a href="/"><i class="fas fa-home"></i></a>
+					</div>
 
 					<div class="wrap-input100 validate-input" data-validate = "Enter Demat_ID">
 						<input class="input100" type="text" name="demat_id" placeholder="Demat ID" required pattern="[A-Z0-9]{10}" oninvalid="this.setCustomValidity('Please enter a valid DEMAT ID')" onchange="this.setCustomValidity('')">
@@ -62,7 +76,7 @@
 					<p class="txt1">
 						Do not have an account?
 					</p>
-					<a href="/register"><button class="btn btn-secondary">Register Now</button></a>
+					<a href="/register?role=trader"><button class="btn btn-secondary">Register Now</button></a>
 				</div>
 			</div>
 		</div>
