@@ -83,7 +83,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/',(req, res) => {
-  res.render(__dirname + '/views/controller.ejs')
+  res.render(__dirname + '/views/register_company.ejs')
 })
 
 app.listen(port, () => {
