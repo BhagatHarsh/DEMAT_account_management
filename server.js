@@ -17,8 +17,11 @@ app.engine('ejs', require('ejs').__express);
 
 //get requests
 app.get('/login', (req, res) => {
-  res.render( __dirname + '/views/login.ejs')
-})
+  const role = req.query.role;
+  console.log(role)
+  res.render(__dirname + `/views/login_${role}`)
+});
+
 
 app.get('/register',(req, res) => {
   res.render( __dirname + '/views/register.ejs')
