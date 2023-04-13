@@ -152,6 +152,22 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post('/prices', async (req, res) => {
+  const companySymbol = req.query.company_name;
+  const newPrice = req.body.price;
+
+  try {
+    const updateCompanyQuery = 'UPDATE Companies SET price = $1 WHERE symbol = $2';
+    const updateCompanyValues = [newPrice, companySymbol];
+    await pool.query(updateCompanyQuery, updateCompanyValues);
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating company price');
+  }
+});
+
+
 
 app.get('/',(req, res) => {
   res.render(__dirname + '/views/controller.ejs')
