@@ -143,20 +143,25 @@ const registerBroker = async (data) => {
   }
 };
 
-const userBuyRequest = async (data) => {
-  try{
+// const userBuyRequest = async (data) => {
+//   try{
 
 
 
-  }
+//   }
 
 
 
-};
+// };
 
 const getCompanyByGstNumber = async (gstNumber) => {
   try {
-    const queryText = 'SELECT * FROM company_info WHERE gst_number = $1';
+    const queryText = `
+      SELECT ci.gst_number, c.symbol, c.company_name, c.price, ci.password
+      FROM company_info ci
+      JOIN companies c ON ci.symbol = c.symbol
+      WHERE ci.gst_number = $1
+    `;
     const queryValues = [gstNumber];
     const { rows } = await pool.query(queryText, queryValues);
     return rows[0];
@@ -164,6 +169,7 @@ const getCompanyByGstNumber = async (gstNumber) => {
     throw err;
   }
 };
+
 
 
 
