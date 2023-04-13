@@ -66,7 +66,7 @@ app.post('/register', async (req, res) => {
     }else if(role === "company"){
       try {
         const data = await query.registerCompany(req.body);
-        // res.redirect(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+        res.redirect(__dirname + '/views/company_page1.ejs', { data });
         res.send(data)
       } catch (err) {
         console.error(err);
@@ -112,15 +112,15 @@ app.post('/login', async (req, res) => {
     } else if (role === "company") {
       try {
         const { gst_number, password } = req.body;
-        const company = await query.getCompanyByGstNumber(gst_number);
-        console.log("company", company)
-        bcrypt.compare(password, company.password, (err, isMatch) => {
+        const data = await query.getCompanyByGstNumber(gst_number);
+        console.log("company", data)
+        bcrypt.compare(password, data.password, (err, isMatch) => {
           if (err) {
             res.status(401).send('Invalid login credentials');
           } else if (!isMatch) {
             res.status(401).send('Invalid login credentials');
           } else {
-            res.redirect(`/company?id=${company.symbol}`);
+            res.redirect(__dirname + '/views/company_page1.ejs', { data });
           }
         });
       } catch (err) {

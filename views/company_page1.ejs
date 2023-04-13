@@ -49,7 +49,7 @@
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');">
 			<div class="wrap-login100">
 				<h2>Company Dashboard</h2>
-				<h3><%= company_name %> (<%= company_symbol %>)</h3>
+				<h3><%= data.company_name %> (<%= data.company_symbol %>)</h3>
 				<div id="price-form">
 					<h4>Add Price</h4>
 					<form action="/prices?company_name=<%= company_name %>" method="POST">
