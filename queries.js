@@ -131,6 +131,7 @@ const getCompanyByGstNumber = async (gstNumber) => {
 const resetDatabase = async () => {
   try {
     const tables = [
+      'balance',
       'users_broker',
       'share_purchased',
       'phone_number',
