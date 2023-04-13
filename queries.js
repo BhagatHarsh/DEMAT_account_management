@@ -143,16 +143,16 @@ const registerBroker = async (data) => {
   }
 };
 
-const userBuyRequest = async (data) => {
-  try{
+// const userBuyRequest = async (data) => {
+//   try{
 
 
 
-  }
+//   }
 
 
 
-};
+// };
 
 const getCompanyByGstNumber = async (gstNumber) => {
   try {
