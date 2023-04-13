@@ -81,6 +81,10 @@ const registerTrader = async (data) => {
     const insertDematDetailsValues = [dematID, data.account_number, data.ifsc_code];
     await pool.query(insertDematDetailsQuery, insertDematDetailsValues);
 
+    const insertIntoBalance = 'INSERT INTO balance (account_number, balance) VALUES ($1, $2)';
+    const insertIntoBalanceValues = [data.account_number, 0]
+    await pool.query(insertIntoBalance, insertIntoBalanceValues)
+
     // Return the Demat ID to be displayed to the user
     data.demat_id = dematID
     return data;
@@ -105,7 +109,7 @@ const registerCompany = async (data) => {
     await pool.query(insertCompanyInfoQuery, insertCompanyInfoValues);
 
     // Return the company symbol to be displayed to the user
-    return data.company_symbol;
+    return data;
   } catch (err) {
     throw err;
   }
