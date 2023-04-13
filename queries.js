@@ -124,6 +124,8 @@ const getCompanyByGstNumber = async (gstNumber) => {
 
 
 
+
+
 const resetDatabase = async () => {
   try {
     const tables = [
@@ -157,6 +159,8 @@ const resetDatabase = async () => {
     throw err;
   }
 };
+
+
 
 
 
