@@ -49,16 +49,28 @@
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');">
 			<div class="wrap-login100">
 				<h2>Company Dashboard</h2>
-				<h3><%= data.company_name %> (<%= data.company_symbol %>)</h3>
+				<h3><%= data.company_name %> (<%= data.symbol %>)</h3>
 				<div id="price-form">
 					<h4>Add Price</h4>
-					<form action="/prices?company_name=<%= company_name %>" method="POST">
+					<form id="add-price-form" method="POST">
 						<div class="form-group">
-							<label for="price">Price:</label>
-							<input type="number" class="form-control" id="price" name="price" required>
-						</div>
-						<button type="submit" class="btn btn-primary">Submit</button>
+                            <label for="price">Price:</label>
+                            <input type="number" class="form-control" id="price" name="price" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Price</button>
+                    
 					</form>
+					
+					<script>
+						const form = document.getElementById('add-price-form');
+						form.addEventListener('submit', (event) => {
+							const symbol = '<%= data.symbol %>';
+							const action = `/prices?symbol=${symbol}`;
+							form.action = action;
+						});
+					</script>
+					
+                    
 				</div>
 			</div>
 		</div>

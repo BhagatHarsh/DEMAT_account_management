@@ -5,6 +5,7 @@ const port = 3000
 const query = require('./queries')
 const path = require('path')
 const bcrypt = require('bcrypt')
+const pool = require('./dbConfig').pool
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
@@ -17,6 +18,7 @@ app.engine('ejs', require('ejs').__express);
 
 //get requests
 app.get('/login', (req, res) => {
+  console.log("get login")
   const role = req.query.role;
   console.log(role)
   res.render(__dirname + `/views/login_${role}`)
@@ -24,17 +26,20 @@ app.get('/login', (req, res) => {
 
 
 app.get('/register',(req, res) => {
+  console.log("get register")
   const role = req.query.role;
   console.log(role)
   res.render(__dirname + `/views/register_${role}`)
 })
 
 app.get('/reset',(req, res) => {
+  console.log("get reset")
   query.resetDatabase();
   res.redirect( '/')
 })
 
 app.get('/dashboard', async (req, res) => {
+  console.log("get dashboard")
   try {
     // Get the user ID from the request parameters
     const userId = req.query.id;
@@ -51,6 +56,7 @@ app.get('/dashboard', async (req, res) => {
 
 //post requests
 app.post('/register', async (req, res) => {
+  console.log("post register")
   const role = req.body.role;
   console.log(req.body);
   if(role){
@@ -66,8 +72,7 @@ app.post('/register', async (req, res) => {
     }else if(role === "company"){
       try {
         const data = await query.registerCompany(req.body);
-        res.redirect(__dirname + '/views/company_page1.ejs', { data });
-        res.send(data)
+        res.redirect('/login?role=company')
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
@@ -89,6 +94,7 @@ app.post('/register', async (req, res) => {
 
 // Route for user login
 app.post('/login', async (req, res) => {
+  console.log("post login")
   const role = req.body.role;
   console.log(req.body);
   if (role) {
@@ -120,7 +126,7 @@ app.post('/login', async (req, res) => {
           } else if (!isMatch) {
             res.status(401).send('Invalid login credentials');
           } else {
-            res.redirect(__dirname + '/views/company_page1.ejs', { data });
+            res.render(__dirname + '/views/company_page1.ejs', { data });
           }
         });
       } catch (err) {
@@ -153,14 +159,17 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/prices', async (req, res) => {
-  const companySymbol = req.query.company_name;
+  console.log("post prices")
+  const companySymbol = req.query.symbol;
   const newPrice = req.body.price;
 
+  console.log(req.query)
+  console.log(req.body)
   try {
     const updateCompanyQuery = 'UPDATE Companies SET price = $1 WHERE symbol = $2';
     const updateCompanyValues = [newPrice, companySymbol];
     await pool.query(updateCompanyQuery, updateCompanyValues);
-    res.redirect('/dashboard');
+    res.redirect('/');
   } catch (err) {
     console.error(err);
     res.status(500).send('Error updating company price');
@@ -170,6 +179,7 @@ app.post('/prices', async (req, res) => {
 
 
 app.get('/',(req, res) => {
+  console.log("get /")
   res.render(__dirname + '/views/controller.ejs')
 })
 
