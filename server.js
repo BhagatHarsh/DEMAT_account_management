@@ -75,8 +75,9 @@ app.post('/register', async (req, res) => {
       }
     }else if(role === "broker"){
       try {
-        const dematID = await query.registerBroker(req.body);
-        res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+        const data = await query.registerBroker(req.body);
+        // res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
+        res.send(data);
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');

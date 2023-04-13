@@ -81,8 +81,8 @@ const registerTrader = async (data) => {
     const insertDematDetailsValues = [dematID, data.account_number, data.ifsc_code];
     await pool.query(insertDematDetailsQuery, insertDematDetailsValues);
 
-    const insertIntoBalance = 'INSERT INTO balance (account_number, balance) VALUES ($1, $2)';
-    const insertIntoBalanceValues = [data.account_number, 0]
+    const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
+    const insertIntoBalanceValues = [data.account_number]
     await pool.query(insertIntoBalance, insertIntoBalanceValues)
 
     // Return the Demat ID to be displayed to the user
@@ -113,6 +113,45 @@ const registerCompany = async (data) => {
   } catch (err) {
     throw err;
   }
+};
+
+
+const registerBroker = async (data) => {
+  try {
+    // Hash the company's password before storing it in the database
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    // Insert company data into the Companies table
+    const brokerID = dematgen.generateDematID();
+    const insertBrokerQuery = 'INSERT INTO Broker (Broker_name, Password, Broker_ID) VALUES ($1, $2, $3)';
+    const insertBrokerValues = [data.broker_name, data.password, brokerID];
+    await pool.query(insertBrokerQuery, insertBrokerValues);
+
+    // Insert company info data into the Company_info table
+    const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
+    const insertIntoBalanceValues = [data.account_number]
+    await pool.query(insertIntoBalance, insertIntoBalanceValues)
+
+    const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2, $3)';
+    const insertBrokerPhoneValues = [data.brokerID, data.phone_number]
+    
+
+    // Return the company symbol to be displayed to the user
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const userBuyRequest = async (data) => {
+  try{
+
+
+
+  }
+
+
+
 };
 
 const getCompanyByGstNumber = async (gstNumber) => {
@@ -171,6 +210,7 @@ const resetDatabase = async () => {
 // Export the functions for use in other modules
 module.exports = {
   registerTrader,
+  registerBroker,
   resetDatabase,
   registerCompany,
   getTraderByPanNumber,
