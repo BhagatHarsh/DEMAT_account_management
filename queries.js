@@ -154,7 +154,7 @@ const registerBroker = async (data) => {
 
     const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2, $3)';
     const insertBrokerPhoneValues = [data.brokerID, data.phone_number]
-    
+    await pool.query(insertBrokerPhoneQuery, insertBrokerPhoneValues);
 
     // Return the company symbol to be displayed to the user
     data.broker_id = brokerID;
@@ -235,7 +235,6 @@ const resetDatabase = async () => {
   try {
     const tables = [
       'balance',
-      'users_broker',
       'share_purchased',
       'phone_number',
       'mutual_fund_invest',
