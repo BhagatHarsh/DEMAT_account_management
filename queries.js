@@ -94,6 +94,7 @@ const registerTrader = async (data) => {
   }
 };
 
+
 const registerCompany = async (data) => {
   try {
     // Hash the company's password before storing it in the database
@@ -173,6 +174,31 @@ const getCompanyByGstNumber = async (gstNumber) => {
 };
 
 
+const buyShares = async (data) => {
+  try {
+
+    // Insert company data into the Companies table
+    const brokerID = dematgen.generateDematID();
+    const insertBrokerQuery = 'INSERT INTO Broker (Broker_name, Password, Broker_ID) VALUES ($1, $2, $3)';
+    const insertBrokerValues = [data.broker_name, data.password, brokerID];
+    await pool.query(insertBrokerQuery, insertBrokerValues);
+
+    // Insert company info data into the Company_info table
+    const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
+    const insertIntoBalanceValues = [data.account_number]
+    await pool.query(insertIntoBalance, insertIntoBalanceValues)
+
+    const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2, $3)';
+    const insertBrokerPhoneValues = [data.brokerID, data.phone_number]
+    
+
+    // Return the company symbol to be displayed to the user
+    data.broker_id = brokerID;
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
 
 
 
@@ -218,6 +244,7 @@ const resetDatabase = async () => {
 
 // Export the functions for use in other modules
 module.exports = {
+  buyShares,
   registerTrader,
   registerBroker,
   resetDatabase,

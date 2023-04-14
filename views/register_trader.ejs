@@ -107,6 +107,13 @@
             <span class="focus-input100" data-placeholder="&#xf19c;"></span>
           </div>
 
+          <label for="broker">Broker name:</label>
+              <select name="broker" id="broker">
+              <% brokerNames.forEach(name => { %>
+              <option value="<%= name %>"><%= name %></option>
+              <% }); %>
+              </select>
+
           <div class="container-login100-form-btn">
             <button class="login100-form-btn" name="role" value="trader">
               Register
