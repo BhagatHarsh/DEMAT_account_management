@@ -66,9 +66,10 @@ const registerTrader = async (data) => {
     await pool.query(insertPhoneQuery, insertPhoneValues);
 
     // Insert bank data into the Banks table
-    const insertBankQuery = 'INSERT INTO Banks (bank_name, ifsc_code) VALUES ($1, $2)';
-    const insertBankValues = [data.bank_name, data.ifsc_code];
+    const insertBankQuery = 'INSERT INTO Banks (bank_name, ifsc_code) VALUES ($1, $2) ON CONFLICT (ifsc_code) DO NOTHING';
+    const insertBankValues = [data.bank_name, data.ifsc_code]
     await pool.query(insertBankQuery, insertBankValues);
+
 
     // Insert demat data into the Demat table
     const dematID = dematgen.generateDematID();
@@ -137,6 +138,7 @@ const registerBroker = async (data) => {
     
 
     // Return the company symbol to be displayed to the user
+    data.broker_id = brokerID;
     return data;
   } catch (err) {
     throw err;

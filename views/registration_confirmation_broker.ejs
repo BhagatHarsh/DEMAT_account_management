@@ -29,10 +29,11 @@
 <!--===============================================================================================-->
 </head>
 <body>
+
 	<style>#symbol {
-		position: absolute;
+		position: fixed;
 		top: 30px;
-  		right: 30px;
+  		right: 525px;
 		padding: 10px;
 		font-size: 44px;
 		color: #f5f6f8;
@@ -47,40 +48,26 @@
 					<span class="login100-form-logo">
 						<i class="zmdi zmdi-landscape"></i>
 					</span>
-
 					<span class="login100-form-title p-b-34 p-t-27">
-						Log in
+						Thank you for registering!
 					</span>
-					<div class="home-icon" id="symbol">
-						<a href="/"><i class="fas fa-home"></i></a>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate = "Enter Demat_ID">
-						<input class="input100" type="text" name="demat_id" placeholder="Demat ID" required pattern="[A-Z0-9]{10}" oninvalid="this.setCustomValidity('Please enter a valid DEMAT ID')" onchange="this.setCustomValidity('')">
-						<span class="focus-input100" data-placeholder="&#xf207;"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="password" name="password" placeholder="Password" required pattern=".{8,}" oninvalid="this.setCustomValidity('Please enter a password with at least 8 characters')" onchange="this.setCustomValidity('')">
-						<span class="focus-input100" data-placeholder="&#xf191;"></span>
-					</div>
-
-					<div class="container-login100-form-btn">
-						<button class="login100-form-btn" value="trader" name="role">
-							Login
-						</button>
-					</div>
-
+					<span class="login100-form-title p-b-34 p-t-27" style="font-size: 16px;">
+						Your Broker ID is: <%= brokerID %>
+					</span>
+					<span class="login100-form-title p-b-34 p-t-27" style="font-size: 16px;">
+						Please save this ID for future reference.
+					</span>
+					
+					
+	
 				</form>
 				<div class="text-center p-t-90">
-					<p class="txt1">
-						Do not have an account?
-					</p>
-					<a href="/register?role=trader"><button class="btn btn-secondary">Register Now</button></a>
+					<a href="/login?role=trader"><button class="btn btn-primary">Log in</button></a>
 				</div>
 			</div>
 		</div>
 	</div>
+	
 	
 
 	<div id="dropDownSelect1"></div>

@@ -63,7 +63,7 @@ app.post('/register', async (req, res) => {
     if(role === "trader"){
       try {
         const data = await query.registerTrader(req.body);
-        res.render(__dirname + '/views/trader_page1.ejs', { dematID: data.demat_id });
+        res.render(__dirname + '/views/registration_confirmation_trader.ejs', { dematID: data.demat_id });
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
@@ -72,7 +72,7 @@ app.post('/register', async (req, res) => {
     }else if(role === "company"){
       try {
         const data = await query.registerCompany(req.body);
-        res.redirect('/login?role=company')
+        res.render(__dirname + '/views/registration_confirmation_company.ejs');
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
@@ -81,8 +81,7 @@ app.post('/register', async (req, res) => {
     }else if(role === "broker"){
       try {
         const data = await query.registerBroker(req.body);
-        // res.render(__dirname + '/views/registration_confirmation.ejs', { dematID:dematID });
-        res.send(data);
+        res.render(__dirname + '/views/registration_confirmation_broker.ejs', { brokerID: data.broker_id });
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
