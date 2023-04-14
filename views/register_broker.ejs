@@ -71,13 +71,25 @@
               onchange="this.setCustomValidity('')">
             <span class="focus-input100" data-placeholder="&#xf191;"></span>
           </div>
+
+          <div class="wrap-input100 validate-input">
+            <span class="focus-input100"></span>
+            <% for (let i = 0; i < exchanges.length; i++) { %>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="exchanges" value="<%= exchanges[i].exchange_name %>">
+                <label class="form-check-label" for="exchanges">
+                  <%= exchanges[i].exchange_name %>
+                </label>
+              </div>
+            <% } %>
+          </div>
           
+
           <div class="container-login100-form-btn">
             <button class="login100-form-btn" name="role" value="broker">
               Register
             </button>
           </div>
-          
         </form>
         <div class="text-center p-t-90">
           <p class="txt1">

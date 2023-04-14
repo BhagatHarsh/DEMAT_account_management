@@ -62,7 +62,14 @@ const getBrokerNames = async () => {
   }
 }
 
-
+const getExchangeNames = async () => {
+  try {
+    const queryResult = await pool.query('SELECT exchange_name, city FROM exchanges');
+    return queryResult.rows;
+  } catch (err) {
+    throw err;
+  }
+}
 
 
 const registerTrader = async (data) => {
@@ -144,25 +151,34 @@ const registerBroker = async (data) => {
     // Insert company data into the Companies table
     const brokerID = dematgen.generateDematID();
     const insertBrokerQuery = 'INSERT INTO Broker (Broker_name, Password, Broker_ID) VALUES ($1, $2, $3)';
-    const insertBrokerValues = [data.broker_name, data.password, brokerID];
+    const insertBrokerValues = [data.broker_name, hashedPassword, brokerID];
     await pool.query(insertBrokerQuery, insertBrokerValues);
 
-    // Insert company info data into the Company_info table
-    const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
-    const insertIntoBalanceValues = [data.account_number]
-    await pool.query(insertIntoBalance, insertIntoBalanceValues)
-
+    // Insert broker info data into the Broker_Phoneno table
     const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2)';
     const insertBrokerPhoneValues = [brokerID, data.phone_number]
     await pool.query(insertBrokerPhoneQuery, insertBrokerPhoneValues);
 
-    // Return the company symbol to be displayed to the user
+    // Insert exchanges data for the broker into the Broker_Exchange table
+    for (let i = 0; i < data.exchanges.length; i++) {
+      const insertBrokerExchangeQuery = 'INSERT INTO Broker_Exchange (Broker_ID, Exchange_name) VALUES ($1, $2)';
+      const insertBrokerExchangeValues = [brokerID, data.exchanges[i]]
+      await pool.query(insertBrokerExchangeQuery, insertBrokerExchangeValues);
+    }
+
+    // Insert broker account balance into the balance table
+    const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
+    const insertIntoBalanceValues = [data.account_number]
+    await pool.query(insertIntoBalance, insertIntoBalanceValues)
+
+    // Return the broker data to be displayed to the user
     data.broker_id = brokerID;
     return data;
   } catch (err) {
     throw err;
   }
 };
+
 
 // const userBuyRequest = async (data) => {
 //   try{
@@ -191,6 +207,20 @@ const getCompanyByGstNumber = async (gstNumber) => {
   }
 };
 
+const getBrokerById = async (brokerId) => {
+  try {
+    const queryResult = await pool.query('SELECT * FROM broker WHERE broker_id = $1', [brokerId]);
+    if (queryResult.rows.length === 0) {
+      return null; // broker not found
+    }
+    const broker = queryResult.rows[0];
+    return broker;
+  } catch (err) {
+    throw err;
+  }
+}
+
+
 
 const buyShares = async (data) => {
   try {
@@ -206,8 +236,10 @@ const buyShares = async (data) => {
     const insertIntoBalanceValues = [data.account_number]
     await pool.query(insertIntoBalance, insertIntoBalanceValues)
 
-    const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2, $3)';
-    const insertBrokerPhoneValues = [data.brokerID, data.phone_number]
+
+    const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2)';
+    const insertBrokerPhoneValues = [brokerID, data.phone_number]
+    await pool.query(insertBrokerPhoneQuery, insertBrokerPhoneValues);
     
 
     // Return the company symbol to be displayed to the user
@@ -280,5 +312,7 @@ module.exports = {
   getUserByDematId,
   getCompanyByGstNumber,
   getbalance,
-  getBrokerNames
+  getBrokerNames,
+  getExchangeNames,
+  getBrokerById
 };

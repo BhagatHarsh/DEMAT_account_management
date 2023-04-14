@@ -31,9 +31,13 @@ app.get('/register', async (req, res) => {
   console.log(role)
   if(role === "trader") {
     const brokerNames = await query.getBrokerNames();
-    res.render(__dirname + `/views/register_trader`, { brokerNames });
-  }else
-  res.render(__dirname + `/views/register_${role}`)
+    res.render(__dirname + `/views/register_trader`, { brokerNames: brokerNames });
+  }else if(role === "broker") {
+    const exchanges = await query.getExchangeNames();
+    res.render(__dirname + `/views/register_broker`, { exchanges: exchanges });
+  }else if(role === "company") {
+  res.render(__dirname + `/views/register_company`);
+  }
 })
 
 app.get('/reset', (req, res) => {
@@ -89,6 +93,8 @@ app.post('/register', async (req, res) => {
       }
     } else if (role === "broker") {
       try {
+        const selectedExchanges = req.body.exchanges || [];
+        console.log(selectedExchanges)
         const data = await query.registerBroker(req.body);
         res.render(__dirname + '/views/registration_confirmation_broker.ejs', { brokerID: data.broker_id });
       } catch (err) {
@@ -190,7 +196,7 @@ app.post('/login', async (req, res) => {
       try {
         const { broker_id, password } = req.body;
         const data = await query.getBrokerById(broker_id);
-        bcrypt.compare(password, broker.password, (err, isMatch) => {
+        bcrypt.compare(password, data.password, (err, isMatch) => {
           if (err) {
             res.status(401).send('Invalid login credentials');
           } else if (!isMatch) {
