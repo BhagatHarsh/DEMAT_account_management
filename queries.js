@@ -6,7 +6,7 @@ const dematgen = require('./utils/dematgen')
 const getUserByDematId = async (demat_id) => {
   try {
     // Get the user's data from the users and demat tables using a join query
-    const queryText = 'SELECT u.pan_number, u.first_name, u.last_name, u.pincode, d.demat_id FROM users u JOIN demat d ON u.pan_number = d.pan_number WHERE d.demat_id = $1';
+    const queryText = 'SELECT u.password, u.pan_number, u.first_name, u.last_name, u.pincode, d.demat_id FROM users u JOIN demat d ON u.pan_number = d.pan_number WHERE d.demat_id = $1';
     const result = await pool.query(queryText, [demat_id]);
 
     // If no user data is found, throw an error

@@ -11,7 +11,7 @@ const pool = require('./dbConfig').pool
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
-app.set('view engine','ejs'); 
+app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.engine('ejs', require('ejs').__express);
 
@@ -25,33 +25,38 @@ app.get('/login', (req, res) => {
 });
 
 
-app.get('/register',(req, res) => {
+app.get('/register', (req, res) => {
   console.log("get register")
   const role = req.query.role;
   console.log(role)
   res.render(__dirname + `/views/register_${role}`)
 })
 
-app.get('/reset',(req, res) => {
+app.get('/reset', (req, res) => {
   console.log("get reset")
   query.resetDatabase();
-  res.redirect( '/')
+  res.redirect('/')
 })
 
 app.get('/dashboard', async (req, res) => {
   console.log("get dashboard")
-  try {
-    // Get the user ID from the request parameters
-    const userId = req.query.id;
-    // Get the user from the database based on the user ID
-    const data = await query.getUserByDematId(userId);
-    console.log(data)
-    // Render the dashboard page with the user's information
-    res.render(__dirname + '/views/dashboard.ejs', { data, demat_id:userId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error retrieving user information');
+  console.log(req.body)
+  console.log(req.query)
+  const role = req.query.role;
+  const data = JSON.parse(decodeURIComponent(req.query.data));
+  console.log(data)
+  if (role === "trader") {
+    try {
+      // Render the dashboard page with the user's information
+      res.render(__dirname + '/views/dashboard_user.ejs', { data });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error retrieving user information');
+    }
+  } else if (role === "broker") {
+
   }
+
 });
 
 //post requests
@@ -59,8 +64,8 @@ app.post('/register', async (req, res) => {
   console.log("post register")
   const role = req.body.role;
   console.log(req.body);
-  if(role){
-    if(role === "trader"){
+  if (role) {
+    if (role === "trader") {
       try {
         const data = await query.registerTrader(req.body);
         res.render(__dirname + '/views/registration_confirmation_trader.ejs', { dematID: data.demat_id });
@@ -69,7 +74,7 @@ app.post('/register', async (req, res) => {
         res.status(500).send('Error inserting user data');
         res.redirect('/register?role=trader')
       }
-    }else if(role === "company"){
+    } else if (role === "company") {
       try {
         const data = await query.registerCompany(req.body);
         res.render(__dirname + '/views/registration_confirmation_company.ejs');
@@ -78,7 +83,7 @@ app.post('/register', async (req, res) => {
         res.status(500).send('Error inserting user data');
         res.redirect('/register?role=company')
       }
-    }else if(role === "broker"){
+    } else if (role === "broker") {
       try {
         const data = await query.registerBroker(req.body);
         res.render(__dirname + '/views/registration_confirmation_broker.ejs', { brokerID: data.broker_id });
@@ -99,15 +104,17 @@ app.post('/login', async (req, res) => {
   if (role) {
     if (role === "trader") {
       try {
-        const { pan_number, password } = req.body;
-        const user = await query.getTraderByPanNumber(pan_number);
+        const { demat_id, password } = req.body;
+        const user = await query.getUserByDematId(demat_id);
+        console.log("trader", user)
         bcrypt.compare(password, user.password, (err, isMatch) => {
           if (err) {
             res.status(401).send('Invalid login credentials');
           } else if (!isMatch) {
             res.status(401).send('Invalid login credentials');
           } else {
-            res.redirect(`/trader?id=${pan_number}`);
+            const encodedData = encodeURIComponent(JSON.stringify(user));
+            res.redirect(`/dashboard?role=trader&data=${encodedData}`);
           }
         });
       } catch (err) {
@@ -135,14 +142,15 @@ app.post('/login', async (req, res) => {
     } else if (role === "broker") {
       try {
         const { broker_id, password } = req.body;
-        const broker = await query.getBrokerById(broker_id);
+        const data = await query.getBrokerById(broker_id);
         bcrypt.compare(password, broker.password, (err, isMatch) => {
           if (err) {
             res.status(401).send('Invalid login credentials');
           } else if (!isMatch) {
             res.status(401).send('Invalid login credentials');
           } else {
-            res.redirect(`/broker?id=${broker_id}`);
+            const encodedBroker = encodeURIComponent(JSON.stringify(data));
+            res.redirect(`/dashboard?role=broker&data=${encodedBroker}`);
           }
         });
       } catch (err) {
@@ -177,7 +185,7 @@ app.post('/prices', async (req, res) => {
 
 
 
-app.get('/',(req, res) => {
+app.get('/', (req, res) => {
   console.log("get /")
   res.render(__dirname + '/views/controller.ejs')
 })
