@@ -15,7 +15,11 @@ const getUserByDematId = async (demat_id) => {
     }
 
     // Return the user data
-    return result.rows[0];
+    const data = result.rows[0];
+    console.log(data);
+    const balance = await pool.query('select balance from balance where account_number = $1', [data.account_number]);
+    data.balance = balance.rows[0];
+    return data;
   } catch (err) {
     throw err;
   }
@@ -200,6 +204,16 @@ const buyShares = async (data) => {
   }
 };
 
+const getbalance = async (data) => {
+  try{
+    const balance = await pool.query('select balance from balance where account_number = $1', [data.account_number]);
+    return balance.rows[0].balance;
+  }
+  catch (err) {
+    throw err;
+  }
+};
+
 
 
 
@@ -251,5 +265,6 @@ module.exports = {
   registerCompany,
   getTraderByPanNumber,
   getUserByDematId,
-  getCompanyByGstNumber
+  getCompanyByGstNumber,
+  getbalance
 };
