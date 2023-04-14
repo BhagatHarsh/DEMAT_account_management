@@ -25,10 +25,14 @@ app.get('/login', (req, res) => {
 });
 
 
-app.get('/register', (req, res) => {
+app.get('/register', async (req, res) => {
   console.log("get register")
   const role = req.query.role;
   console.log(role)
+  if(role === "trader") {
+    const brokerNames = await query.getBrokerNames();
+    res.render(__dirname + `/views/register_trader`, { brokerNames });
+  }else
   res.render(__dirname + `/views/register_${role}`)
 })
 

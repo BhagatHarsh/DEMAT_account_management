@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Login</title>
+	<title>Company Dashboard</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--===============================================================================================-->	
@@ -30,69 +29,45 @@
 <!--===============================================================================================-->
 </head>
 <body>
-	<style>#symbol {
-		position: absolute;
-		top: 30px;
-  		right: 30px;
-		padding: 10px;
-		font-size: 44px;
-		color: #f5f6f8;
-		background-color: #f387e8;
-	}
-  button.btn {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
+
+	<style>
+		#symbol {
+			position: fixed;
+			top: 30px;
+			right: 525px;
+			padding: 10px;
+			font-size: 44px;
+			color: #f5f6f8;
+			background-color: #f387e8;
+		}
+		#price-form {
+			margin: 50px;
+		}
 	</style>
-	
-  
+
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');">
 			<div class="wrap-login100">
-				<form class="login100-form validate-form" action="/login" method="POST">
-					<span class="login100-form-logo">
-						<i class="zmdi zmdi-landscape"></i>
-					</span>
-
-					<span class="login100-form-title p-b-34 p-t-27" style ="font-size:28px">
-						Welcome, <%= data.first_name %> <%= data.last_name %>!
-					</span>
-
-					<span class="login100-form-title p-b-34 p-t-10" style="font-size:16px">
-						PAN Number: <%= data.pan_number %>
-					</span>
-
-					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
-						Balance: <%= data.balance %>
-					</span>
-
-					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
-						DEMAT ID: <%= data.demat_id %>
-					</span>
-          <a href="/">
-          <div class="text-center p-t-15">
-            <button class="btn btn-primary" >View My Portfolio</button>
-          </div>
-          </a>
-          <a href="/login?role=trader"></a>
-					<div class="text-center p-t-15">
-            <button class="btn btn-primary" >Buy Stocks</button>
-          </div>
-          </a>
-          <a href="/login?role=trader"></a>
-          <div class="text-center p-t-15">
-            <button class="btn btn-primary" >Share Stocks</button>
-          </div>
-          </a>
-
-				</form>
+				<h2>Company Dashboard</h2  
+					</form>
+					
+					<script>
+						const form = document.getElementById('add-price-form');
+						form.addEventListener('submit', (event) => {
+							const symbol = '<%= data.symbol %>';
+							const action = `/prices?symbol=${symbol}`;
+							form.action = action;
+						});
+					</script>
+					
+                    
+				</div>
 			</div>
 		</div>
 	</div>
-	
 
 	<div id="dropDownSelect1"></div>
-	
+
 <!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
@@ -103,12 +78,4 @@
 <!--===============================================================================================-->
 	<script src="vendor/select2/select2.min.js"></script>
 <!--===============================================================================================-->
-	<script src="vendor/daterangepicker/moment.min.js"></script>
-	<script src="vendor/daterangepicker/daterangepicker.js"></script>
-<!--===============================================================================================-->
-	<script src="vendor/countdowntime/countdowntime.js"></script>
-<!--===============================================================================================-->
-	<script src="js/main.js"></script>
-
-</body>
-</html>
+	<script src="vendor/daterangepicker/moment
