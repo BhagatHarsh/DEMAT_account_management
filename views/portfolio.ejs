@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search...">
+      <button id="search-btn">Search</button>
+    </div class = "table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Company Name</th>
+          <th>Price</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (var i = 0; i < stocks.length; i++) { %>
+          <tr>
+            <td><%= stocks[i].symbol %></td>
+            <td><%= stocks[i].name %></td>
+            <td><%= stocks[i].price %></td>
+            <td><%= stocks[i].quantity %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -260,6 +260,17 @@ const getbalance = async (data) => {
   }
 };
 
+const getCompaniesData = async () => {
+  try {
+    const query = 'SELECT * FROM companies';
+    const { rows } = await pool.query(query);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 
 
 
@@ -304,6 +315,7 @@ const resetDatabase = async () => {
 // Export the functions for use in other modules
 module.exports = {
   buyShares,
+  getCompaniesData,
   registerTrader,
   registerBroker,
   resetDatabase,
