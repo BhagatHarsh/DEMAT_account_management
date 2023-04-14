@@ -5,21 +5,19 @@ const dematgen = require('./utils/dematgen')
 
 const getUserByDematId = async (demat_id) => {
   try {
-    // Get the user's data from the users and demat tables using a join query
-    const queryText = 'SELECT u.password, u.pan_number, u.first_name, u.last_name, u.pincode, d.demat_id FROM users u JOIN demat d ON u.pan_number = d.pan_number WHERE d.demat_id = $1';
+    const queryText = 'SELECT * FROM users u JOIN demat d ON u.pan_number = d.pan_number WHERE d.demat_id = $1';
     const result = await pool.query(queryText, [demat_id]);
 
-    // If no user data is found, throw an error
     if (result.rows.length === 0) {
       throw new Error('User not found');
     }
 
-    // Return the user data
     return result.rows[0];
   } catch (err) {
     throw err;
   }
 };
+
 
 
 const getTraderByPanNumber = async (pan_number) => {
@@ -48,6 +46,18 @@ const getTraderByPanNumber = async (pan_number) => {
     throw err;
   }
 };
+
+const getBrokerNames = async () => {
+  try {
+    const queryResult = await pool.query('SELECT broker_name FROM broker');
+    const brokerNames = queryResult.rows.map(row => row.broker_name);
+    return brokerNames;
+  } catch (err) {
+    throw err;
+  }
+}
+
+
 
 
 const registerTrader = async (data) => {
@@ -251,5 +261,6 @@ module.exports = {
   registerCompany,
   getTraderByPanNumber,
   getUserByDematId,
-  getCompanyByGstNumber
+  getCompanyByGstNumber,
+  getBrokerNames
 };
