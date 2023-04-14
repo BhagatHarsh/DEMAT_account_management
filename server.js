@@ -100,6 +100,23 @@ app.post('/register', async (req, res) => {
   }
 });
 
+//Route for portfolio
+app.get('/portfolio', async(req,res)=> {
+  console.log("my portfolio")
+  const role = req.query.role;
+  console.log(role)
+  try {
+    // Render the dashboard page with the user's information
+    res.render(__dirname + '/views/view_my_portfolio.ejs', { data });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving portfolio');
+  }
+
+
+
+})
+
 // Route for user login
 app.post('/login', async (req, res) => {
   console.log("post login")
