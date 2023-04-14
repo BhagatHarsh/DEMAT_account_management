@@ -102,20 +102,46 @@ app.post('/register', async (req, res) => {
 
 //Route for portfolio
 app.get('/portfolio', async(req,res)=> {
-  console.log("my portfolio")
+  console.log("get portfolio")
+  console.log(req.body)
+  console.log(req.query)
   const role = req.query.role;
-  console.log(role)
+  const data = JSON.parse(decodeURIComponent(req.query.data));
   try {
     // Render the dashboard page with the user's information
     res.render(__dirname + '/views/view_my_portfolio.ejs', { data });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving portfolio');
-  }
+  }});
 
+  app.get('/buy_stock', async(req,res)=> {
+    console.log("buy stock")
+    console.log(req.body)
+    console.log(req.query)
+    const data = JSON.parse(decodeURIComponent(req.query.data));
+    try {
+      // Render the dashboard page with the user's information
+      res.render(__dirname + '/views/buy_stocks.ejs', { data });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error retrieving page');
+    }
+});
 
-
-})
+app.get('/sell_stock', async(req,res)=> {
+  console.log("sell stocks")
+  console.log(req.body)
+  console.log(req.query)
+  const role = req.query.role;
+  const data = JSON.parse(decodeURIComponent(req.query.data));
+  try {
+    // Render the dashboard page with the user's information
+    res.render(__dirname + '/views/sell_stocks.ejs', { data });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving page');
+  }});
 
 // Route for user login
 app.post('/login', async (req, res) => {

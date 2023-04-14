@@ -69,23 +69,22 @@
 					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
 						DEMAT ID: <%= data.demat_id %>
 					</span>
-          <a href="/">
-          <div class="text-center p-t-15">
-            <button class="btn btn-primary" >View My Portfolio</button>
-          </div>
-          </a>
-          <a href="/login?role=trader"></a>
-					<div class="text-center p-t-15">
-            <button class="btn btn-primary" >Buy Stocks</button>
-          </div>
-          </a>
-          <a href="/login?role=trader"></a>
-          <div class="text-center p-t-15">
-            <button class="btn btn-primary" >Share Stocks</button>
-          </div>
-          </a>
-
 				</form>
+        <a href="/portfolio?data=<%= encodeURIComponent(JSON.stringify(data));%>">
+          <div class="text-center p-t-15">
+            <button class="btn btn-primary">View My Portfolio</button>
+          </div>
+        </a>
+        <a href="/buy_stock?data=<%= encodeURIComponent(JSON.stringify(data));%>">
+          <div class="text-center p-t-15">
+            <button class="btn btn-primary">Buy Stocks</button>
+          </div>
+        </a>
+        <a href="/sell_stock?data=<%= encodeURIComponent(JSON.stringify(data));%>">
+          <div class="text-center p-t-15">
+            <button class="btn btn-primary">Sell Stocks</button>
+          </div>
+        </a>
 			</div>
 		</div>
 	</div>
@@ -93,6 +92,14 @@
 
 	<div id="dropDownSelect1"></div>
 	
+  <script>
+    const form = document.getElementById('add-price-form');
+    form.addEventListener('submit', (event) => {
+      const symbol = '<%= data.symbol %>';
+      const action = `/prices?symbol=${symbol}`;
+      form.action = action;
+    });
+  </script>
 <!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->

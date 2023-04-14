@@ -101,8 +101,11 @@ const registerTrader = async (data) => {
     const insertIntoBalanceValues = [data.account_number]
     await pool.query(insertIntoBalance, insertIntoBalanceValues)
 
+    const insertIntoDemat_Broker = 'INSERT INTO Demat_Broker(Broker_name, demat_id) VALUES ($1, $2)';
+    const insertIntoDemat_BrokerValues = [data.broker, dematID];
+    await pool.query(insertIntoDemat_Broker, insertIntoDemat_BrokerValues)
     // Return the Demat ID to be displayed to the user
-    data.demat_id = dematID
+    data.demat_id = dematID;
     return data;
   } catch (err) {
     throw err;
@@ -277,5 +280,6 @@ module.exports = {
   getTraderByPanNumber,
   getUserByDematId,
   getCompanyByGstNumber,
-  getbalance
+  getbalance,
+  getBrokerNames
 };
