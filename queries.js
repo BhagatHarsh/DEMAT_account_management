@@ -265,7 +265,17 @@ const buyShares = async (data) => {
   }
 };
 
+const eventAddBuyStocks = async (data) => {
+  try {
+    const query = 'INSERT INTO broker_buy (demat_id, symbol, exchange_name, quantity) VALUES ($1, $2, $3, $4)';
+    const values = [data.user.demat_id, data.symbol, data.exchange, data.quantity];
+    const result = await pool.query(query, values);
 
+    return result.rowCount;
+  } catch (err) {
+    throw err;
+  }
+};
 
 const getbalance = async (data) => {
   try{
