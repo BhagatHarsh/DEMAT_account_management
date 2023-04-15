@@ -40,11 +40,11 @@ app.get('/register', async (req, res) => {
   }
 })
 
-app.get('/reset', (req, res) => {
-  console.log("get reset")
-  query.resetDatabase();
-  res.redirect('/')
-})
+// app.get('/reset', (req, res) => {
+//   console.log("get reset")
+//   query.resetDatabase();
+//   res.redirect('/')
+// })
 
 app.get('/dashboard', async (req, res) => {
   console.log("get dashboard")
@@ -62,9 +62,10 @@ app.get('/dashboard', async (req, res) => {
       res.status(500).send('Error retrieving user information');
     }
   } else if (role === "broker") {
-
+    res.send("Not implemented")
+  }else{
+    res.send("Not implemented")
   }
-
 });
 
 //post requests
@@ -239,6 +240,11 @@ app.post('/prices', async (req, res) => {
 app.get('/', (req, res) => {
   console.log("get /")
   res.render(__dirname + '/views/controller.ejs')
+})
+
+app.get('/*', async (req, res) => {
+  console.log("get /*")
+  res.render(__dirname + '/views/404.ejs', { req, title: "Page Not Found" })
 })
 
 app.listen(port, () => {

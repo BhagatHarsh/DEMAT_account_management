@@ -210,11 +210,7 @@ const getCompanyByGstNumber = async (gstNumber) => {
 const getBrokerById = async (brokerId) => {
   try {
     const queryResult = await pool.query('SELECT * FROM broker WHERE broker_id = $1', [brokerId]);
-    if (queryResult.rows.length === 0) {
-      return null; // broker not found
-    }
-    const broker = queryResult.rows[0];
-    return broker;
+    return queryResult.rows[0];
   } catch (err) {
     throw err;
   }
