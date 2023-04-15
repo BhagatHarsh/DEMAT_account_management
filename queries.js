@@ -5,23 +5,34 @@ const dematgen = require('./utils/dematgen')
 
 const getUserByDematId = async (demat_id) => {
   try {
-    const queryText = 'SELECT * FROM users u JOIN demat d ON u.pan_number = d.pan_number JOIN demat_details dd ON d.demat_id = dd.demat_id WHERE d.demat_id = $1';
+    const queryText = `
+      SELECT *
+      FROM users u
+      JOIN demat d ON u.pan_number = d.pan_number
+      JOIN demat_details dd ON d.demat_id = dd.demat_id
+      JOIN demat_broker db ON d.demat_id = db.demat_id
+      JOIN broker b ON db.broker_name = b.broker_name
+      WHERE d.demat_id = $1
+    `;
     const result = await pool.query(queryText, [demat_id]);
 
     if (result.rows.length === 0) {
       throw new Error('User not found');
     }
 
-    // Return the user data
+    // Return the user data and broker details
     const data = result.rows[0];
-    console.log(data);
-    const balance = await pool.query('select balance from balance where account_number = $1', [data.account_number]);
+    const balance = await pool.query('SELECT balance FROM balance WHERE account_number = $1', [data.account_number]);
     data.balance = balance.rows[0].balance;
+
+    const phone_number = await pool.query('SELECT phone_number FROM broker_phoneno WHERE broker_id = $1', [data.broker_id]);
+    data.phone_number = phone_number.rows[0].phone_number;
     return data;
   } catch (err) {
     throw err;
   }
 };
+
 
 
 

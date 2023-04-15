@@ -29,9 +29,12 @@ for (var i = 0; i < buttons.length; i++) {
     })
     .then(() => {
       alert(quantity + " shares of " + this.id + " bought successfully!");
-      document.getElementById('success-msg').style.display = 'block';
-      setTimeout(function() {
-        document.getElementById('success-msg').style.display = 'none';
+      insertText = "Request has been sent to "+ user.broker_name +" successfully."
+        document.getElementById('success-msg').innerHTML = insertText;
+        document.getElementById('success-msg').style.display = 'block';
+        setTimeout(function() {
+        document.getElementById('success-msg').innerHTML = "";
+        document.getElementById('success-msg').style.display = 'none';        
       }, 5000); // 5000 milliseconds = 5 seconds
     })    
     .catch((error) => {

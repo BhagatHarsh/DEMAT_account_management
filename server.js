@@ -139,7 +139,7 @@ app.post('/buy_stock', async (req, res) => {
   try{
     console.log("post buy_stock")
     const data = req.body
-    // console.log(data)
+    console.log(data)
     res.status(500).send('Success')
   } catch (err) {
     console.error(err);
