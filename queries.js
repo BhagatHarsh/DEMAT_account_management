@@ -221,30 +221,12 @@ const getBrokerById = async (brokerId) => {
 const buyShares = async (data) => {
   try {
 
-    // Insert company data into the Companies table
-    const brokerID = dematgen.generateDematID();
-    const insertBrokerQuery = 'INSERT INTO Broker (Broker_name, Password, Broker_ID) VALUES ($1, $2, $3)';
-    const insertBrokerValues = [data.broker_name, data.password, brokerID];
-    await pool.query(insertBrokerQuery, insertBrokerValues);
-
-    // Insert company info data into the Company_info table
-    const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
-    const insertIntoBalanceValues = [data.account_number]
-    await pool.query(insertIntoBalance, insertIntoBalanceValues)
-
-
-    const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2)';
-    const insertBrokerPhoneValues = [brokerID, data.phone_number]
-    await pool.query(insertBrokerPhoneQuery, insertBrokerPhoneValues);
-    
-
-    // Return the company symbol to be displayed to the user
-    data.broker_id = brokerID;
-    return data;
   } catch (err) {
     throw err;
   }
 };
+
+
 
 const getbalance = async (data) => {
   try{
@@ -265,9 +247,6 @@ const getCompaniesData = async () => {
     throw error;
   }
 };
-
-
-
 
 
 const resetDatabase = async () => {
@@ -322,5 +301,5 @@ module.exports = {
   getbalance,
   getBrokerNames,
   getExchangeNames,
-  getBrokerById
+  getBrokerById,
 };

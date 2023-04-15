@@ -30,14 +30,14 @@ app.get('/register', async (req, res) => {
   console.log("get register")
   const role = req.query.role;
   console.log(role)
-  if(role === "trader") {
+  if (role === "trader") {
     const brokerNames = await query.getBrokerNames();
     res.render(__dirname + `/views/register_trader`, { brokerNames: brokerNames });
-  }else if(role === "broker") {
+  } else if (role === "broker") {
     const exchanges = await query.getExchangeNames();
     res.render(__dirname + `/views/register_broker`, { exchanges: exchanges });
-  }else if(role === "company") {
-  res.render(__dirname + `/views/register_company`);
+  } else if (role === "company") {
+    res.render(__dirname + `/views/register_company`);
   }
 })
 
@@ -64,7 +64,7 @@ app.get('/dashboard', async (req, res) => {
     }
   } else if (role === "broker") {
     res.send("Not implemented")
-  }else{
+  } else {
     res.send("Not implemented")
   }
 });
@@ -122,26 +122,31 @@ app.get('/portfolio', async (req, res) => {
 });
 
 
-
-  app.get('/buy_stock', async(req,res)=> {
-    try {
-      // Render the dashboard page with the user's information
-      const data = await query.getCompaniesData(req.body);
-      // console.log(data);
-      res.render(__dirname + '/views/buy_stock.ejs', { data });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error retrieving portfolio');
-    }
-  });
+app.get('/buy_stock', async (req, res) => {
+  try {
+    // Render the dashboard page with the user's information
+    const data = await query.getCompaniesData(req.body);
+    // console.log(data);
+    res.render(__dirname + '/views/buy_stock.ejs', { data });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving portfolio');
+  }
+});
 
 app.post('/buy_stock', async (req, res) => {
-  console.log("post buy_stock")
-  const data = req.body
-  console.log(data)
+  try{
+    console.log("post buy_stock")
+    const data = req.body
+    // console.log(data)
+    res.status(500).send('Success')
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving portfolio');
+  }
 })
 
-app.get('/sell_stock', async(req,res)=> {
+app.get('/sell_stock', async (req, res) => {
   console.log("sell stocks")
   console.log(req.body)
   console.log(req.query)
@@ -153,7 +158,8 @@ app.get('/sell_stock', async(req,res)=> {
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving page');
-  }});
+  }
+});
 
 // Route for user login
 app.post('/login', async (req, res) => {

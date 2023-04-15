@@ -1,0 +1,13 @@
+
+#success-msg {
+    display: none;
+    font-weight: bold;
+    color: green;
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    border: 2px solid green;
+    padding: 1rem;
+    border-radius: 5px;
+}        

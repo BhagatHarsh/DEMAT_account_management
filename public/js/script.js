@@ -4,11 +4,21 @@ var buttons = document.querySelectorAll("button");
 for (var i = 0; i < buttons.length; i++) {
   buttons[i].addEventListener("click", function() {
     var quantity = prompt("Enter quantity for button " + this.id + ":");
+    // Get the search string from the URL
+    const searchParams = new URLSearchParams(window.location.search);
+
+    // Get the "data" parameter from the search string
+    const dataParam = searchParams.get('data');
+
+    // Parse the JSON data into an object
+    const user = JSON.parse(decodeURIComponent(dataParam));
+
     var data = {
       company_name: this.id,
       quantity: quantity,
       symbol: this.getAttribute("data-symbol"),
-      price: this.getAttribute("data-price")
+      price: this.getAttribute("data-price"),
+      user: user
     };
     fetch('/buy_stock', {
       method: 'POST',
@@ -16,9 +26,19 @@ for (var i = 0; i < buttons.length; i++) {
       headers: {
         'Content-Type': 'application/json'
       }
-    }).then(() => {
+    })
+    .then(() => {
+      alert(quantity + " shares of " + this.id + " bought successfully!");
       document.getElementById('success-msg').style.display = 'block';
-    });    
+      setTimeout(function() {
+        document.getElementById('success-msg').style.display = 'none';
+      }, 5000); // 5000 milliseconds = 5 seconds
+    })    
+    .catch((error) => {
+      console.error('An error occurred:', error);
+      alert('An error occurred. Please try again later.');
+    });
+        
   });
 }
 
