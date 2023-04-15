@@ -177,7 +177,11 @@ const registerBroker = async (data) => {
       await pool.query(insertBrokerExchangeQuery, insertBrokerExchangeValues);
     }
 
+    const InsrtIntoBroker_Account = 'Insert into broker_account(broker_id,account_number) VALUES ($1,$2)';
+    const InsrtIntoBroker_AccountValues= [brokerID, data.account_number] 
+    await pool.query(InsrtIntoBroker_Account, InsrtIntoBroker_AccountValues);
     // Insert broker account balance into the balance table
+
     const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
     const insertIntoBalanceValues = [data.account_number]
     await pool.query(insertIntoBalance, insertIntoBalanceValues)
