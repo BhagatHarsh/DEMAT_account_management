@@ -134,8 +134,11 @@ app.get('/portfolio', async (req, res) => {
 app.get('/buy_stock', async (req, res) => {
   try {
     // Render the dashboard page with the user's information
+
     const data = await query.getCompaniesData(req.body);
-    // console.log(data);
+    const exchanges = await query.getExchangeNames();
+    data.exchanges = exchanges.map(exchange => exchange.exchange_name);
+    console.log(data);
     res.render(__dirname + '/views/buy_stock.ejs', { data });
   } catch (err) {
     console.error(err);
@@ -144,9 +147,10 @@ app.get('/buy_stock', async (req, res) => {
 });
 
 app.post('/buy_stock', async (req, res) => {
-  try{
+  try {
     console.log("post buy_stock")
     const data = req.body
+    query.eventAddBuyStocks(data)
     console.log(data)
     res.status(500).send('Success')
   } catch (err) {

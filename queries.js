@@ -102,7 +102,7 @@ const getBrokerNames = async () => {
 
 const getExchangeNames = async () => {
   try {
-    const queryResult = await pool.query('SELECT exchange_name, city FROM exchanges');
+    const queryResult = await pool.query('SELECT exchange_name FROM exchanges');
     return queryResult.rows;
   } catch (err) {
     throw err;
@@ -292,24 +292,24 @@ const resetDatabase = async () => {
   try {
     const tables = [
       'phone_number',
-      'mutual_fund_invest',
-      'mf_purchased',
+      // 'mutual_fund_invest',
+      // 'mf_purchased',
       'share_purchased',
-      'broker_exchange',
+      // 'broker_exchange',
       'broker_check',
       'listing',
       // 'company_info',
       // 'companies',
-      'demat_broker',
+      // 'demat_broker',
       'demat_details',
-      'broker_phoneno',
-      'broker_account',
+      // 'broker_phoneno',
+      // 'broker_account',
       'banks',
       'balance',
-      'broker',
+      // 'broker',
       'demat',
       'users',
-      'exchanges'
+      // 'exchanges'
     ];
 
     for (let i = 0; i < tables.length; i++) {
@@ -344,4 +344,5 @@ module.exports = {
   getBrokerNames,
   getExchangeNames,
   getBrokerById,
+  eventAddBuyStocks,
 };
