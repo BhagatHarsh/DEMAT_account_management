@@ -95,8 +95,9 @@ app.post('/register', async (req, res) => {
       }
     } else if (role === "broker") {
       try {
-        const selectedExchanges = req.body.exchanges || [];
-        console.log(selectedExchanges)
+        const selectedExchanges = typeof req.body.exchanges === 'string' ? [req.body.exchanges] : req.body.exchanges || [];
+        console.log(selectedExchanges);
+        req.body.exchanges = selectedExchanges
         const data = await query.registerBroker(req.body);
         res.render(__dirname + '/views/registration_confirmation_broker.ejs', { brokerID: data.broker_id });
       } catch (err) {
