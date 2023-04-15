@@ -22,13 +22,13 @@
               <td><%= data[i].symbol %></td>
               <td><%= data[i].company_name %></td>
               <td><%= data[i].price %></td>
-              <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buyModal" data-symbol="<%= data[i].symbol %>" data-name="<%= data[i].company_name %>" data-price="<%= data[i].price %>">Buy</button></td>
+              <td><button type="button" id="<%= data[i].company_name %>" class="btn btn-primary" data-toggle="modal" data-target="#buyModal" data-symbol="<%= data[i].symbol %>" data-name="<%= data[i].company_name %>" data-price="<%= data[i].price %>">Buy</button></td>
             </tr>
           <% } %>
         </tbody>
-      </table>
+      </table>      
     </div>
-    
-    <script src="script.js"></script>
+    <p id="success-msg" style="display: none; color: green">Successfully purchased stock!</p>
+    <script src="js/script.js"></script>
   </body>
 </html>

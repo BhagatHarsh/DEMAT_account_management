@@ -1,11 +1,24 @@
 // Get all the buttons
 var buttons = document.querySelectorAll("button");
 
-// Loop through each button and add a click event listener
 for (var i = 0; i < buttons.length; i++) {
   buttons[i].addEventListener("click", function() {
-    var quantity = prompt("Enter quantity:");
-    console.log(quantity); // Replace this with your desired code
+    var quantity = prompt("Enter quantity for button " + this.id + ":");
+    var data = {
+      company_name: this.id,
+      quantity: quantity,
+      symbol: this.getAttribute("data-symbol"),
+      price: this.getAttribute("data-price")
+    };
+    fetch('/buy_stock', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(() => {
+      document.getElementById('success-msg').style.display = 'block';
+    });    
   });
 }
 
@@ -15,7 +28,7 @@ var searchbar = document.getElementById("search-bar");
 // Add a keyup event listener to the search bar
 searchbar.addEventListener("keyup", function() {
   // Get the table and table rows
-  var table = document.getElementById("stocks-table");
+  var table = document.getElementById("stocks");
   var rows = table.getElementsByTagName("tr");
 
   // Get the search query

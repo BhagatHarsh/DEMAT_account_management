@@ -9,7 +9,8 @@ const pool = require('./dbConfig').pool
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -111,8 +112,8 @@ app.post('/register', async (req, res) => {
 app.get('/portfolio', async (req, res) => {
   try {
     // Render the dashboard page with the user's information
-    const data = await query.getCompaniesData(req.body);
-    console.log(data);
+    const data = await query.getCompaniesData();
+    // console.log(data);
     res.render(__dirname + '/views/view_my_portfolio.ejs', { data });
   } catch (err) {
     console.error(err);
@@ -120,19 +121,25 @@ app.get('/portfolio', async (req, res) => {
   }
 });
 
-  
+
 
   app.get('/buy_stock', async(req,res)=> {
     try {
       // Render the dashboard page with the user's information
       const data = await query.getCompaniesData(req.body);
-      console.log(data);
+      // console.log(data);
       res.render(__dirname + '/views/buy_stock.ejs', { data });
     } catch (err) {
       console.error(err);
       res.status(500).send('Error retrieving portfolio');
     }
   });
+
+app.post('/buy_stock', async (req, res) => {
+  console.log("post buy_stock")
+  const data = req.body
+  console.log(data)
+})
 
 app.get('/sell_stock', async(req,res)=> {
   console.log("sell stocks")
