@@ -69,6 +69,16 @@
 					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
 						DEMAT ID: <%= data.demat_id %>
 					</span>
+
+					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
+						Broker Name: <%= data.broker_name %>
+					</span>
+
+					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
+						Contact your broker at: <%= data.phone_number %>
+					</span>
+
+
 				</form>
         <a href="/portfolio?data=<%= encodeURIComponent(JSON.stringify(data));%>">
           <div class="text-center p-t-15">
