@@ -267,23 +267,25 @@ const getCompaniesData = async () => {
 const resetDatabase = async () => {
   try {
     const tables = [
-      'balance',
-      'share_purchased',
       'phone_number',
       'mutual_fund_invest',
       'mf_purchased',
-      'listing',
-      'exchanges',
-      'demat_details',
-      'demat_broker',
-      'demat',
-      'company_info',
-      'companies',
-      'broker_phoneno',
+      'share_purchased',
       'broker_exchange',
-      'broker',
+      'broker_check',
+      'listing',
+      // 'company_info',
+      // 'companies',
+      'demat_broker',
+      'demat_details',
+      'broker_phoneno',
+      'broker_account',
       'banks',
-      'users'
+      'balance',
+      'broker',
+      'demat',
+      'users',
+      'exchanges'
     ];
 
     for (let i = 0; i < tables.length; i++) {

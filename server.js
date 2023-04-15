@@ -41,11 +41,11 @@ app.get('/register', async (req, res) => {
   }
 })
 
-// app.get('/reset', (req, res) => {
-//   console.log("get reset")
-//   query.resetDatabase();
-//   res.redirect('/')
-// })
+app.get('/reset', (req, res) => {
+  console.log("get reset")
+  query.resetDatabase();
+  res.redirect('/')
+})
 
 app.get('/dashboard', async (req, res) => {
   console.log("get dashboard")
