@@ -2,24 +2,25 @@
 var buttons = document.querySelectorAll("button");
 
 for (var i = 0; i < buttons.length; i++) {
-  buttons[i].addEventListener("click", function() {
+  buttons[i].addEventListener("click", function () {
     var quantity = prompt("Enter quantity for button " + this.id + ":");
     // Get the search string from the URL
     const searchParams = new URLSearchParams(window.location.search);
-
     // Get the "data" parameter from the search string
     const dataParam = searchParams.get('data');
-
     // Parse the JSON data into an object
     const user = JSON.parse(decodeURIComponent(dataParam));
-
+    const select = document.getElementById('my-select');
+    const selectedOptionValue = select.value;
     var data = {
       company_name: this.id,
-      quantity: quantity,
+      quantity: parseInt(quantity),
       symbol: this.getAttribute("data-symbol"),
-      price: this.getAttribute("data-price"),
-      user: user
+      price: parseInt(this.getAttribute("data-price")),
+      user: user,
+      exchange: selectedOptionValue
     };
+    
     fetch('/buy_stock', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -27,21 +28,20 @@ for (var i = 0; i < buttons.length; i++) {
         'Content-Type': 'application/json'
       }
     })
-    .then(() => {
-      alert(quantity + " shares of " + this.id + " bought successfully!");
-      insertText = "Request has been sent to "+ user.broker_name +" successfully."
+      .then(() => {
+        alert(quantity + " shares of " + this.id + " bought successfully!");
+        insertText = "Request has been sent to " + user.broker_name + " successfully."
         document.getElementById('success-msg').innerHTML = insertText;
         document.getElementById('success-msg').style.display = 'block';
-        setTimeout(function() {
-        document.getElementById('success-msg').innerHTML = "";
-        document.getElementById('success-msg').style.display = 'none';        
-      }, 5000); // 5000 milliseconds = 5 seconds
-    })    
-    .catch((error) => {
-      console.error('An error occurred:', error);
-      alert('An error occurred. Please try again later.');
-    });
-        
+        setTimeout(function () {
+          document.getElementById('success-msg').innerHTML = "";
+          document.getElementById('success-msg').style.display = 'none';
+        }, 5000); // 5000 milliseconds = 5 seconds
+      })
+      .catch((error) => {
+        console.error('An error occurred:', error);
+        alert('An error occurred. Please try again later.');
+      });
   });
 }
 
@@ -49,7 +49,7 @@ for (var i = 0; i < buttons.length; i++) {
 var searchbar = document.getElementById("search-bar");
 
 // Add a keyup event listener to the search bar
-searchbar.addEventListener("keyup", function() {
+searchbar.addEventListener("keyup", function () {
   // Get the table and table rows
   var table = document.getElementById("stocks");
   var rows = table.getElementsByTagName("tr");
