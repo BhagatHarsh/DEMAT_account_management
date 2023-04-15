@@ -9,16 +9,6 @@
       <div class="row">
         <div class="col-md-6 offset-md-3">
           <h1 class="my-4">Buy Stocks</h1>
-          <div class="form-group">
-            <label for="broker" class="col-form-label">Exchange name:</label>
-            <select name="broker" id="my-select" class="form-control">
-              <% for(let i = 0; i < data.exchanges.length; i++) { %>
-              <option value="<%= data.exchanges[i] %>">
-                <%= data.exchanges[i] %>
-              </option>
-              <% } %>
-            </select>
-          </div>          
           <p id="success-msg" style="display: none; color: green; font-weight: bold;"></p>
           <div class="row">
             <div class="col-12 col-md-6 mb-4">
@@ -30,18 +20,19 @@
               <thead>
                 <tr>
                   <th>Symbol</th>
-                  <th>Company Name</th>
-                  <th>Price</th>
-                  <th></th>
+                  <th>demat_id</th>
+                  <th>quantity</th>
+                  <th>price</th>
                 </tr>
               </thead>
               <tbody style="height: 100px; overflow: auto">
                 <% for (let i = 0; i < data.length; i++) { %>
                   <tr>
                     <td><%= data[i].symbol %></td>
-                    <td><%= data[i].company_name %></td>
+                    <td><%= data[i].demat_id %></td>
+                    <td><%= data[i].quantity %></td>
                     <td><%= data[i].price %></td>
-                    <td><button type="button" id="<%= data[i].company_name %>" class="btn btn-primary" data-toggle="modal" data-target="#buyModal" data-symbol="<%= data[i].symbol %>" data-name="<%= data[i].company_name %>" data-price="<%= data[i].price %>">Buy</button></td>
+                    <td><button type="button" id="<%= data[i].demat_id %>" class="btn btn-primary" data-toggle="modal" data-target="#buyModal" data-symbol="<%= data[i].symbol %>" data-name="<%= data[i].company_name %>" data-price="<%= data[i].price %>">Buy</button></td>
                   </tr>
                 <% } %>
               </tbody>

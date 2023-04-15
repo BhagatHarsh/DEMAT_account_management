@@ -100,6 +100,15 @@ const getBrokerNames = async () => {
   }
 }
 
+const getExchangeNamesFromBrokerId = async (broker_id) => {
+  try {
+    const queryResult = await pool.query('SELECT exchange_name FROM broker_exchange WHERE broker_id = $1', [broker_id]);
+    return queryResult.rows;
+  } catch (err) {
+    throw err;
+  }
+}
+
 const getExchangeNames = async () => {
   try {
     const queryResult = await pool.query('SELECT exchange_name FROM exchanges');
@@ -355,4 +364,5 @@ module.exports = {
   getExchangeNames,
   getBrokerById,
   eventAddBuyStocks,
+  getExchangeNamesFromBrokerId,
 };

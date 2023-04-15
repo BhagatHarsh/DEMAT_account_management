@@ -132,11 +132,12 @@ app.get('/portfolio', async (req, res) => {
 
 
 app.get('/buy_stock', async (req, res) => {
+  console.log("get buy_stock")
   try {
     // Render the dashboard page with the user's information
-
-    const data = await query.getCompaniesData(req.body);
-    const exchanges = await query.getExchangeNames();
+    const user = JSON.parse(decodeURIComponent(req.query.data));
+    const data = await query.getCompaniesData();
+    const exchanges = await query.getExchangeNamesFromBrokerId(user.broker_id);
     data.exchanges = exchanges.map(exchange => exchange.exchange_name);
     console.log(data);
     res.render(__dirname + '/views/buy_stock.ejs', { data });
@@ -147,11 +148,12 @@ app.get('/buy_stock', async (req, res) => {
 });
 
 app.post('/buy_stock', async (req, res) => {
+  console.log("post buy_stock")
   try {
     console.log("post buy_stock")
     const data = req.body
     query.eventAddBuyStocks(data)
-    console.log(data)
+    // console.log(data)
     res.status(500).send('Success')
   } catch (err) {
     console.error(err);
@@ -169,6 +171,18 @@ app.get('/sell_stock', async (req, res) => {
     // Render the dashboard page with the user's information
     res.render(__dirname + '/views/sell_stocks.ejs', { data });
   } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving page');
+  }
+});
+
+app.get('/broker_buy', async (req, res) => {
+  console.log("get broker buy")
+  const data = JSON.parse(decodeURIComponent(req.query.data));
+  console.log(data)
+  try{
+    res.render(__dirname + '/views/broker_buy.ejs', { data });
+  }catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving page');
   }
@@ -221,7 +235,7 @@ app.post('/login', async (req, res) => {
       try {
         const { broker_id, password } = req.body;
         const data = await query.getBrokerDetails(broker_id);
-        console.log(data);
+        // console.log(data);
         bcrypt.compare(password, data.password, (err, isMatch) => {
           if (err) {
             res.status(401).send('Invalid login credentials');
