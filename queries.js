@@ -33,6 +33,33 @@ const getUserByDematId = async (demat_id) => {
   }
 };
 
+const getBrokerDetails = async (broker_id) => {
+  try {
+    const queryText = `
+      SELECT *
+      FROM broker b
+      JOIN broker_account ba ON b.broker_id = ba.broker_id
+      JOIN balance bl ON ba.account_number = bl.account_number
+      WHERE b.broker_id = $1
+    `;
+    const result = await pool.query(queryText, [broker_id]);
+
+    if (result.rows.length === 0) {
+      throw new Error('Broker not found');
+    }
+    
+
+    // Return the broker data and account details
+    const data = result.rows[0];
+    const phone_number = await pool.query('SELECT phone_number FROM broker_phoneno WHERE broker_id = $1', [broker_id]);
+    data.phone_number = phone_number.rows[0].phone_number;
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 
 
 
@@ -228,10 +255,7 @@ const getBrokerById = async (brokerId) => {
     return queryResult.rows[0];
   } catch (err) {
     throw err;
-  }
-}
-
-
+  }}
 
 const buyShares = async (data) => {
   try {
@@ -307,6 +331,7 @@ const resetDatabase = async () => {
 // Export the functions for use in other modules
 module.exports = {
   buyShares,
+  getBrokerDetails,
   getCompaniesData,
   registerTrader,
   registerBroker,

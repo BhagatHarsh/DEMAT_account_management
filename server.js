@@ -63,7 +63,13 @@ app.get('/dashboard', async (req, res) => {
       res.status(500).send('Error retrieving user information');
     }
   } else if (role === "broker") {
-    res.send("Not implemented")
+    try {
+      // Render the dashboard page with the user's information
+      res.render(__dirname + '/views/dashboard_broker.ejs', { data });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error retrieving user information');
+    }
   } else {
     res.send("Not implemented")
   }
@@ -108,6 +114,8 @@ app.post('/register', async (req, res) => {
     }
   }
 });
+
+
 
 //Route for portfolio
 app.get('/portfolio', async (req, res) => {
@@ -208,7 +216,8 @@ app.post('/login', async (req, res) => {
     } else if (role === "broker") {
       try {
         const { broker_id, password } = req.body;
-        const data = await query.getBrokerById(broker_id);
+        const data = await query.getBrokerDetails(broker_id);
+        console.log(data);
         bcrypt.compare(password, data.password, (err, isMatch) => {
           if (err) {
             res.status(401).send('Invalid login credentials');
