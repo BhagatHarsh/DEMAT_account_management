@@ -59,7 +59,16 @@ const getBrokerDetails = async (broker_id) => {
   }
 };
 
+const Share_Purchased = async(data)=>{
+  try{
+    const queryforSP = 'Insert into share_purchased(demat_id, symbol, no_of_shares) VALUES($1,$2,$3) ';
+    const queryforSPValues = [data.demat_id, data.symbol, data.quantity]
+    await pool.query(queryforSP,queryforSPValues);
 
+  }catch(err){
+    throw err;
+  }
+};
 
 
 
