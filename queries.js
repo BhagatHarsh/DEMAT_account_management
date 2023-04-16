@@ -63,7 +63,7 @@ const approvedStocks = async (symbol, brokerId) => {
   try {
     // Get the list of all demat IDs and their respective quantities for the given symbol
     const { rows: brokerBuyRows } = await pool.query(`
-      SELECT demat_id, quantity
+      SELECT demat_id, quantity, exchange_name
       FROM broker_buy
       WHERE symbol = $1
     `, [symbol]);
@@ -80,7 +80,7 @@ const approvedStocks = async (symbol, brokerId) => {
     console.log('Broker ID: ', brokerId);
     console.log("brokerBuyRows: ", brokerBuyRows);
     // For each demat ID, calculate the amount to be deducted from the balance
-    for (const { demat_id, quantity } of brokerBuyRows) {
+    for (const { demat_id, quantity, exchange_name } of brokerBuyRows) {
       // Get the price of the symbol from the companies table
       const { rows: companyRows } = await pool.query(`
         SELECT price
@@ -128,12 +128,13 @@ const approvedStocks = async (symbol, brokerId) => {
       await pool.query(`
       INSERT INTO share_purchased (demat_id, symbol, exchange_name, no_of_shares)
       VALUES ($1, $2, $3, $4)
-    `, [demat_id, symbol, exchange, quantity]);
+    `, [demat_id, symbol, exchange_name, quantity]);
     }
   } catch (err) {
     throw err;
   }
 };
+
 
 
 
@@ -356,6 +357,22 @@ const buyShares = async (data) => {
   }
 };
 
+const getSharePurchased = async (demat_id) => {
+  try {
+    const query = `
+      SELECT sp.symbol, sp.exchange_name, sp.no_of_shares as quantity, c.price, c.company_name
+      FROM share_purchased sp
+      JOIN companies c ON sp.symbol = c.symbol
+      WHERE sp.demat_id = $1
+    `;
+    const { rows } = await pool.query(query, [demat_id]);
+    return rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 const eventAddBuyStocks = async (data) => {
   try {
     const query = 'INSERT INTO broker_buy (demat_id, symbol, exchange_name, quantity) VALUES ($1, $2, $3, $4)';
@@ -363,6 +380,15 @@ const eventAddBuyStocks = async (data) => {
     const result = await pool.query(query, values);
 
     return result.rowCount;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const eventAddSellStocks = async (data) => {
+  try {
+    const query = 'INSERT INTO broker_sell (demat_id, symbol, exchange_name, quantity) VALUES ($1, $2, $3, $4)';
+    const values = [data.user.demat_id, data.symbol, data.exchange, data.quantity];
   } catch (err) {
     throw err;
   }
@@ -481,5 +507,7 @@ module.exports = {
   getBrokerBuyDetailsFromName,
   getPriceFromSymbol,
   getMainTableData,
-  approvedStocks,
+  approvedStocks, 
+  eventAddSellStocks,
+  getSharePurchased,
 };
