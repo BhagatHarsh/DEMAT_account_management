@@ -20,7 +20,16 @@ for (var i = 0; i < buttons.length; i++) {
       user: user,
       exchange: selectedOptionValue
     };
-    
+    if(quantity == null || quantity == "" || quantity == 0) {
+      alert("Please enter a valid quantity.");
+      return;
+    } else if(quantity < 0) {
+      alert("Please enter a positive quantity.");
+      return;
+    }else if (quantity*data.price > user.balance) {
+      alert("You do not have enough balance to buy this stock.");
+      return;
+    }
     fetch('/buy_stock', {
       method: 'POST',
       body: JSON.stringify(data),

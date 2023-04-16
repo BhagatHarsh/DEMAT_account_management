@@ -126,9 +126,9 @@ const approvedStocks = async (symbol, brokerId) => {
 
       // Insert the transaction into the share_purchased table
       await pool.query(`
-        INSERT INTO share_purchased (demat_id, symbol, no_of_shares)
-        VALUES ($1, $2, $3)
-      `, [demat_id, symbol, quantity]);
+      INSERT INTO share_purchased (demat_id, symbol, exchange_name, no_of_shares)
+      VALUES ($1, $2, $3, $4)
+    `, [demat_id, symbol, exchange, quantity]);
     }
   } catch (err) {
     throw err;
@@ -323,12 +323,13 @@ const getCompanyByGstNumber = async (gstNumber) => {
 const getMainTableData = async (broker_name) => {
   try {
     const query = `
-    SELECT symbol, SUM(quantity) as total_quantity
+    SELECT broker_buy.symbol, SUM(broker_buy.quantity) as total_quantity, companies.price
     FROM broker_buy
     JOIN demat_broker ON broker_buy.demat_id = demat_broker.demat_id
     JOIN broker ON demat_broker.broker_name = broker.broker_name
+    JOIN companies ON broker_buy.symbol = companies.symbol
     WHERE broker.broker_name = $1
-    GROUP BY symbol;
+    GROUP BY broker_buy.symbol, companies.price;
     `;
     const result = await pool.query(query, [broker_name]);
     return result.rows;
