@@ -52,7 +52,6 @@
                   <th>demat_id</th>
                   <th>quantity</th>
                   <th>price</th>
-                  <th>Action</th>
                 </tr>
               </thead>
               <tbody class="table-scrollable" style="max-height: 200px">
@@ -63,20 +62,8 @@
                   <td><%= data[exchanges[i]][j].quantity %></td>
                   <td><%= data[exchanges[i]][j].price %></td>
                   <td>
-                    <button
-                      type="button"
-                      id="<%= data[exchanges[i]][j].demat_id %>"
-                      class="btn btn-primary"
-                      data-toggle="modal"
-                      data-target="#buyModal"
-                      data-symbol="<%= data[exchanges[i]][j].symbol %>"
-                      data-name="<%= data[exchanges[i]][j].company_name %>"
-                      data-price="<%= data[exchanges[i]][j].price %>"
-                      data-exchange="<%= exchanges[i] %>"
-                      data-quantity="<%= data[exchanges[i]][j].quantity %>"
-                    >
-                      Approve
-                    </button>
+
+                    
                   </td>
                 </tr>
                 <% } %>
