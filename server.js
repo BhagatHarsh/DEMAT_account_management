@@ -210,12 +210,14 @@ app.get('/broker_buy', async (req, res) => {
   }
 });
 
-app.post('/main_table', async (req, res) => { 
+app.get('/main_table', async (req, res) => { 
   console.log("post main_table")
-  const data = req.body
+  const data = JSON.parse(decodeURIComponent(req.query.data));
   console.log(data)
   try {
-    const result = await query.getMainTableData(data);
+    const result = await query.getMainTableData(data.broker_name);
+    console.log(result)
+    res.render(__dirname + '/views/broker_main.ejs', { data: result });
     res.status(200).send(result);
   }
   catch (err) {

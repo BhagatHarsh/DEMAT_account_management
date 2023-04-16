@@ -258,6 +258,25 @@ const getCompanyByGstNumber = async (gstNumber) => {
   }
 };
 
+const getMainTableData = async (broker_name) => {
+  try {
+    const query = `
+    SELECT symbol, SUM(quantity) as total_quantity
+    FROM broker_buy
+    JOIN demat_broker ON broker_buy.demat_id = demat_broker.demat_id
+    JOIN broker ON demat_broker.broker_name = broker.broker_name
+    WHERE broker.broker_name = $1
+    GROUP BY symbol;
+    
+    `;
+    const result = await pool.query(query,[broker_name]);
+    return result.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 const getBrokerById = async (brokerId) => {
   try {
     const queryResult = await pool.query('SELECT * FROM broker WHERE broker_id = $1', [brokerId]);
@@ -398,4 +417,5 @@ module.exports = {
   getExchangeNamesFromBrokerId,
   getBrokerBuyDetailsFromName,
   getPriceFromSymbol,
+  getMainTableData
 };
