@@ -167,9 +167,8 @@ app.post('/approved_stocks', async (req, res) => {
     console.log("post approvedStocks")
     const data = req.body
     console.log(data)
-    // query.approvedStocks(data)
-    const encodedData = encodeURIComponent(JSON.stringify(data.user));
-    res.redirect(`/main_table?data=${encodedData}`);
+    query.approvedStocks(data.symbol, data.user.broker_id)
+    res.status(200).send("sucess")
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving portfolio');
@@ -213,10 +212,10 @@ app.get('/broker_buy', async (req, res) => {
 app.get('/main_table', async (req, res) => {
   console.log("post main_table")
   const data = JSON.parse(decodeURIComponent(req.query.data));
-  console.log(data)
+  // console.log(data)
   try {
     const result = await query.getMainTableData(data.broker_name);
-    console.log(result)
+    // console.log(result)
     res.render(__dirname + '/views/broker_main.ejs', { data: result });
   }
   catch (err) {

@@ -47,7 +47,7 @@ const getBrokerDetails = async (broker_id) => {
     if (result.rows.length === 0) {
       throw new Error('Broker not found');
     }
-    
+
 
     // Return the broker data and account details
     const data = result.rows[0];
@@ -59,13 +59,78 @@ const getBrokerDetails = async (broker_id) => {
   }
 };
 
-const storeSharePurchased = async(data)=>{
-  try{
-    const queryforSP = 'Insert into share_purchased(demat_id, symbol, no_of_shares) VALUES($1,$2,$3) ';
-    const queryforSPValues = [data.demat_id, data.symbol, data.quantity]
-    await pool.query(queryforSP,queryforSPValues);
+const approvedStocks = async (symbol, brokerId) => {
+  try {
+    // Get the list of all demat IDs and their respective quantities for the given symbol
+    const { rows: brokerBuyRows } = await pool.query(`
+      SELECT demat_id, quantity
+      FROM broker_buy
+      WHERE symbol = $1
+    `, [symbol]);
 
-  }catch(err){
+    // Get the commission for the broker from the broker_account table
+    const { rows: brokerAccountRows } = await pool.query(`
+      SELECT commission
+      FROM broker_account
+      WHERE broker_id = $1
+    `, [brokerId]);
+    const brokerCommissionPercent = (brokerAccountRows[0].commission);
+
+    console.log('Broker Commission: ', brokerCommissionPercent);
+    console.log('Broker ID: ', brokerId);
+    console.log("brokerBuyRows: ", brokerBuyRows);
+    // For each demat ID, calculate the amount to be deducted from the balance
+    for (const { demat_id, quantity } of brokerBuyRows) {
+      // Get the price of the symbol from the companies table
+      const { rows: companyRows } = await pool.query(`
+        SELECT price
+        FROM companies
+        WHERE symbol = $1
+      `, [symbol]);
+      const price = companyRows[0].price;
+
+      // Calculate the amount to be deducted from the demat account balance
+      const amount = price * quantity;
+      const commissionAmount = amount * (brokerCommissionPercent / 100);
+      const totalAmount = amount + commissionAmount;
+
+      console.log('Demat ID: ', demat_id);
+      console.log('Symbol: ', symbol);
+      console.log('Quantity: ', quantity);
+      console.log('Amount: ', amount);
+      console.log('Commission: ', commissionAmount);
+      console.log('Total: ', totalAmount);
+
+
+      // Deduct the amount from the demat account balance
+      await pool.query(`
+      UPDATE balance
+      SET balance = balance - $1
+      WHERE account_number IN (
+        SELECT account_number
+        FROM demat_details
+        WHERE demat_id = $2
+      )
+      `, [totalAmount, demat_id]);
+
+      // Increment the broker's account balance by the commission amount
+      await pool.query(`
+        UPDATE balance
+        SET balance = balance + $1
+        WHERE account_number IN (
+          SELECT account_number
+          FROM broker_account
+          WHERE broker_id = $2
+        )
+      `, [commissionAmount, brokerId]);
+
+      // Insert the transaction into the share_purchased table
+      await pool.query(`
+        INSERT INTO share_purchased (demat_id, symbol, no_of_shares)
+        VALUES ($1, $2, $3)
+      `, [demat_id, symbol, quantity]);
+    }
+  } catch (err) {
     throw err;
   }
 };
@@ -223,7 +288,7 @@ const registerBroker = async (data) => {
     }
 
     const InsrtIntoBroker_Account = 'Insert into broker_account(broker_id,account_number) VALUES ($1,$2)';
-    const InsrtIntoBroker_AccountValues= [brokerID, data.account_number] 
+    const InsrtIntoBroker_AccountValues = [brokerID, data.account_number]
     await pool.query(InsrtIntoBroker_Account, InsrtIntoBroker_AccountValues);
     // Insert broker account balance into the balance table
 
@@ -238,18 +303,6 @@ const registerBroker = async (data) => {
     throw err;
   }
 };
-
-
-// const userBuyRequest = async (data) => {
-//   try{
-
-
-
-//   }
-
-
-
-// };
 
 const getCompanyByGstNumber = async (gstNumber) => {
   try {
@@ -276,9 +329,8 @@ const getMainTableData = async (broker_name) => {
     JOIN broker ON demat_broker.broker_name = broker.broker_name
     WHERE broker.broker_name = $1
     GROUP BY symbol;
-    
     `;
-    const result = await pool.query(query,[broker_name]);
+    const result = await pool.query(query, [broker_name]);
     return result.rows;
   } catch (err) {
     throw err;
@@ -292,7 +344,8 @@ const getBrokerById = async (brokerId) => {
     return queryResult.rows[0];
   } catch (err) {
     throw err;
-  }}
+  }
+}
 
 const buyShares = async (data) => {
   try {
@@ -315,7 +368,7 @@ const eventAddBuyStocks = async (data) => {
 };
 
 const getbalance = async (data) => {
-  try{
+  try {
     const balance = await pool.query('select balance from balance where account_number = $1', [data.account_number]);
     return balance.rows[0].balance;
   }
@@ -427,5 +480,5 @@ module.exports = {
   getBrokerBuyDetailsFromName,
   getPriceFromSymbol,
   getMainTableData,
-  storeSharePurchased
+  approvedStocks,
 };
