@@ -360,7 +360,7 @@ const buyShares = async (data) => {
 const getSharePurchased = async (demat_id) => {
   try {
     const query = `
-      SELECT sp.symbol, sp.exchange_name, sp.no_of_shares as quantity, c.price, c.company_name
+      SELECT sp.symbol, sp.exchange_name, sp.no_of_shares, c.price, c.company_name
       FROM share_purchased sp
       JOIN companies c ON sp.symbol = c.symbol
       WHERE sp.demat_id = $1

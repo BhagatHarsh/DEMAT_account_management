@@ -3,31 +3,20 @@ var buttons = document.querySelectorAll("button");
 
 for (var i = 0; i < buttons.length; i++) {
   buttons[i].addEventListener("click", function () {
-    var quantity = prompt("Enter quantity for button " + this.id + ":");
     // Get the search string from the URL
     const searchParams = new URLSearchParams(window.location.search);
     // Get the "data" parameter from the search string
     const dataParam = searchParams.get('data');
     // Parse the JSON data into an object
     const user = JSON.parse(decodeURIComponent(dataParam));
-    const select = document.getElementById('my-select');
-    const selectedOptionValue = select.value;
     var data = {
-      company_name: this.id,
-      quantity: parseInt(quantity),
       symbol: this.getAttribute("data-symbol"),
-      price: parseInt(this.getAttribute("data-price")),
-      user: user,
-      exchange: selectedOptionValue
+      quantity: parseInt(this.getAttribute("data-quantity")),
+      exchange_name: this.id,
+      demat_id: user.demat_id,
+      user: user
     };
-    if(quantity == null || quantity == "" || quantity == 0) {
-      alert("Please enter a valid quantity.");
-      return;
-    } else if(quantity < 0) {
-      alert("Please enter a positive quantity.");
-      return;
-    }
-    fetch('/sell_stock', {
+    fetch('/portfolio', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
@@ -35,7 +24,7 @@ for (var i = 0; i < buttons.length; i++) {
       }
     })
       .then(() => {
-        alert(quantity + " shares of " + this.id + " bought successfully!");
+        alert(data.quantity + " shares of " + data.symbol + " have been sent for approval to " + user.broker_name + "!");
         insertText = "Request has been sent to " + user.broker_name + " successfully."
         document.getElementById('success-msg').innerHTML = insertText;
         document.getElementById('success-msg').style.display = 'block';
@@ -43,6 +32,7 @@ for (var i = 0; i < buttons.length; i++) {
           document.getElementById('success-msg').innerHTML = "";
           document.getElementById('success-msg').style.display = 'none';
         }, 5000); // 5000 milliseconds = 5 seconds
+        location.reload();
       })
       .catch((error) => {
         console.error('An error occurred:', error);
