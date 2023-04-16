@@ -192,17 +192,16 @@ app.get('/sell_stock', async (req, res) => {
 
 app.get('/broker_buy', async (req, res) => {
   console.log("get broker buy")
-  const data = JSON.parse(decodeURIComponent(req.query.data));
-  const broker_buy_by_exchange = await query.getBrokerBuyDetailsFromName(data.broker_name)
-  for (let exchange in broker_buy_by_exchange) {
-    for (let i = 0; i < broker_buy_by_exchange[exchange].length; i++) {
-      let symbol = broker_buy_by_exchange[exchange][i].symbol;
-      let price = await query.getPriceFromSymbol(symbol);
-      broker_buy_by_exchange[exchange][i].price = price;
-    }
-  }  
-  console.log(broker_buy_by_exchange)
   try{
+    const data = JSON.parse(decodeURIComponent(req.query.data));
+    const broker_buy_by_exchange = await query.getBrokerBuyDetailsFromName(data.broker_name)
+    for (let exchange in broker_buy_by_exchange) {
+      for (let i = 0; i < broker_buy_by_exchange[exchange].length; i++) {
+        let symbol = broker_buy_by_exchange[exchange][i].symbol;
+        let price = await query.getPriceFromSymbol(symbol);
+        broker_buy_by_exchange[exchange][i].price = price;
+      }
+    }  
     res.render(__dirname + '/views/broker_buy.ejs', { data:broker_buy_by_exchange });
   }catch (err) {
     console.error(err);
@@ -218,7 +217,6 @@ app.get('/main_table', async (req, res) => {
     const result = await query.getMainTableData(data.broker_name);
     console.log(result)
     res.render(__dirname + '/views/broker_main.ejs', { data: result });
-    res.status(200).json("success");
   }
   catch (err) {
     console.error(err);
