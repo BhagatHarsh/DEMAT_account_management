@@ -9,12 +9,12 @@ for (var i = 0; i < buttons.length; i++) {
     const dataParam = searchParams.get('data');
     // Parse the JSON data into an object
     const user = JSON.parse(decodeURIComponent(dataParam));
-    var data = {
+    let data = {
       quantity: parseInt(this.getAttribute("data-quantity")),
       symbol: this.getAttribute("data-symbol"),
-        user: user
+      user: user
     };
-    
+
     fetch('/approved_stocks', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -23,7 +23,7 @@ for (var i = 0; i < buttons.length; i++) {
       }
     })
       .then(() => {
-        alert(quantity + " shares of " + this.getAttribute("data-symbol") + " approved successfully for " + this.getAttribute("id") + "!");
+        alert(data.quantity + " shares of " + data.symbol + " approved successfully for " + user.broker_name + "!");
         insertText = "Request has been sent to " + user.broker_name + " successfully."
         document.getElementById('success-msg').innerHTML = insertText;
         document.getElementById('success-msg').style.display = 'block';
@@ -67,4 +67,3 @@ searchbar.addEventListener("keyup", function () {
     }
   }
 });
-
