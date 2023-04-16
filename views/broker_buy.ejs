@@ -15,29 +15,34 @@
               <input type="text" id="search-bar" class="form-control" placeholder="Search...">
             </div>
           </div>
-          <div class="table-responsive">
-            <table id="stocks" class="table table-striped table-bordered" style="width:100%">
-              <thead>
-                <tr>
-                  <th>Symbol</th>
-                  <th>demat_id</th>
-                  <th>quantity</th>
-                  <th>price</th>
-                </tr>
-              </thead>
-              <tbody style="height: 100px; overflow: auto">
-                <% for (let i = 0; i < data.length; i++) { %>
+          <% const exchanges = Object.keys(data); %>
+          <% for (let i = 0; i < exchanges.length; i++) { %>
+            <h4><%= exchanges[i] %></h4>
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered" style="width:100%">
+                <thead>
                   <tr>
-                    <td><%= data[i].symbol %></td>
-                    <td><%= data[i].demat_id %></td>
-                    <td><%= data[i].quantity %></td>
-                    <td><%= data[i].price %></td>
-                    <td><button type="button" id="<%= data[i].demat_id %>" class="btn btn-primary" data-toggle="modal" data-target="#buyModal" data-symbol="<%= data[i].symbol %>" data-name="<%= data[i].company_name %>" data-price="<%= data[i].price %>">Approve</button></td>
+                    <th>Symbol</th>
+                    <th>demat_id</th>
+                    <th>quantity</th>
+                    <th>price</th>
+                    <th>Action</th>
                   </tr>
-                <% } %>
-              </tbody>
-            </table>      
-          </div>
+                </thead>
+                <tbody style="height: 100px; overflow: auto">
+                  <% for (let j = 0; j < data[exchanges[i]].length; j++) { %>
+                    <tr>
+                      <td><%= data[exchanges[i]][j].symbol %></td>
+                      <td><%= data[exchanges[i]][j].demat_id %></td>
+                      <td><%= data[exchanges[i]][j].quantity %></td>
+                      <td><%= data[exchanges[i]][j].price %></td>
+                      <td><button type="button" id="<%= data[exchanges[i]][j].demat_id %>" class="btn btn-primary" data-toggle="modal" data-target="#buyModal" data-symbol="<%= data[exchanges[i]][j].symbol %>" data-name="<%= data[exchanges[i]][j].company_name %>" data-price="<%= data[exchanges[i]][j].price %>">Approve</button></td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
         </div>
       </div>
     </div>

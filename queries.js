@@ -306,29 +306,34 @@ const getCompaniesData = async () => {
   }
 };
 
-const getBrokerBuyDetialsFromName = async (brokerName) => {
+const getBrokerBuyDetailsFromName = async (broker_name) => {
   try {
-    // Query to retrieve demat_id for the given broker_name
-    const dematQuery = 'SELECT demat_id FROM demat_broker WHERE broker_name = $1';
-    const dematValues = [brokerName];
-    const dematResult = await pool.query(dematQuery, dematValues);
+    const query = 'SELECT * FROM broker_buy JOIN demat_broker ON broker_buy.demat_id = demat_broker.demat_id WHERE broker_name = $1';
+    const values = [broker_name];
+    const result = await pool.query(query, values);
 
-    // Extract demat_ids from the dematResult
-    const dematIds = dematResult.rows.map(row => row.demat_id);
+    const data = {};
+    result.rows.forEach(row => {
+      const exchangeName = row.exchange_name;
+      const rowWithoutExchangeName = { ...row };
+      delete rowWithoutExchangeName.exchange_name;
+      if (data[exchangeName]) {
+        data[exchangeName].push(rowWithoutExchangeName);
+      } else {
+        data[exchangeName] = [rowWithoutExchangeName];
+      }
+    });
 
-    // Query to retrieve broker buy details for the extracted demat_ids
-    const brokerBuyQuery = 'SELECT * FROM broker_buy WHERE demat_id = ANY($1)';
-    const brokerBuyValues = [dematIds];
-    const brokerBuyResult = await pool.query(brokerBuyQuery, brokerBuyValues);
-
-    return brokerBuyResult.rows;
+    return data;
   } catch (err) {
     throw err;
   }
 };
 
-const getPriceFromSymbol = (symbol) => {
-  
+
+const getPriceFromSymbol = async (symbol) => {
+  const result = await pool.query("SELECT price FROM companies WHERE symbol = $1", [symbol]);
+  return result.rows[0].price;
 }
 
 
@@ -391,5 +396,6 @@ module.exports = {
   getBrokerById,
   eventAddBuyStocks,
   getExchangeNamesFromBrokerId,
-  getBrokerBuyDetialsFromName,
+  getBrokerBuyDetailsFromName,
+  getPriceFromSymbol,
 };
