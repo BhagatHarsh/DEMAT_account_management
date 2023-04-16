@@ -306,6 +306,32 @@ const getCompaniesData = async () => {
   }
 };
 
+const getBrokerBuyDetialsFromName = async (brokerName) => {
+  try {
+    // Query to retrieve demat_id for the given broker_name
+    const dematQuery = 'SELECT demat_id FROM demat_broker WHERE broker_name = $1';
+    const dematValues = [brokerName];
+    const dematResult = await pool.query(dematQuery, dematValues);
+
+    // Extract demat_ids from the dematResult
+    const dematIds = dematResult.rows.map(row => row.demat_id);
+
+    // Query to retrieve broker buy details for the extracted demat_ids
+    const brokerBuyQuery = 'SELECT * FROM broker_buy WHERE demat_id = ANY($1)';
+    const brokerBuyValues = [dematIds];
+    const brokerBuyResult = await pool.query(brokerBuyQuery, brokerBuyValues);
+
+    return brokerBuyResult.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getPriceFromSymbol = (symbol) => {
+  
+}
+
+
 
 const resetDatabase = async () => {
   try {
@@ -365,4 +391,5 @@ module.exports = {
   getBrokerById,
   eventAddBuyStocks,
   getExchangeNamesFromBrokerId,
+  getBrokerBuyDetialsFromName,
 };

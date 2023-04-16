@@ -179,14 +179,17 @@ app.get('/sell_stock', async (req, res) => {
 app.get('/broker_buy', async (req, res) => {
   console.log("get broker buy")
   const data = JSON.parse(decodeURIComponent(req.query.data));
-  console.log(data)
+  const broker_buy = await query.getBrokerBuyDetialsFromName(data.broker_name)
+  console.log(broker_buy)
   try{
-    res.render(__dirname + '/views/broker_buy.ejs', { data });
+    res.render(__dirname + '/views/broker_buy.ejs', { data:broker_buy });
   }catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving page');
   }
 });
+
+
 
 // Route for user login
 app.post('/login', async (req, res) => {
