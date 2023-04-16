@@ -161,6 +161,20 @@ app.post('/buy_stock', async (req, res) => {
   }
 })
 
+app.post('/approved_stocks', async (req, res) => {
+  console.log("post approvedStocks")
+  try {
+    console.log("post approvedStocks")
+    const data = req.body
+    console.log(data)
+    // query.approvedStocks(data)
+    res.status(500).send('Success')
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving portfolio');
+  }
+})
+
 app.get('/sell_stock', async (req, res) => {
   console.log("sell stocks")
   console.log(req.body)
