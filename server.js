@@ -154,7 +154,7 @@ app.post('/buy_stock', async (req, res) => {
     const data = req.body
     query.eventAddBuyStocks(data)
     // console.log(data)
-    res.status(500).send('Success')
+    res.status(200).send('Success')
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving portfolio');
@@ -168,7 +168,7 @@ app.post('/approved_stocks', async (req, res) => {
     const data = req.body
     console.log(data)
     // query.approvedStocks(data)
-    res.status(500).send('Success')
+    res.status(200).send('Success')
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving portfolio');
@@ -210,7 +210,19 @@ app.get('/broker_buy', async (req, res) => {
   }
 });
 
-
+app.post('/main_table', async (req, res) => { 
+  console.log("post main_table")
+  const data = req.body
+  console.log(data)
+  try {
+    const result = await query.getMainTableData(data);
+    res.status(200).send(result);
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving page');
+  }
+});
 
 // Route for user login
 app.post('/login', async (req, res) => {
