@@ -11,11 +11,11 @@ for (var i = 0; i < buttons.length; i++) {
     const user = JSON.parse(decodeURIComponent(dataParam));
     var data = {
       demat_id: this.id,
-      quantity: parseInt(quantity),
+      quantity: parseInt(this.getAttribute("data-quantity")),
       symbol: this.getAttribute("data-symbol"),
       price: parseInt(this.getAttribute("data-price")),
-      broker_name: this.getAttribute("data-broker"),
-      exchange_name: this.getAttribute("data-exchange")
+      exchange_name: this.getAttribute("data-exchange"),
+        user: user
     };
     
     fetch('/approved_stocks', {
@@ -47,23 +47,27 @@ var searchbar = document.getElementById("search-bar");
 
 // Add a keyup event listener to the search bar
 searchbar.addEventListener("keyup", function () {
-  // Get the table and table rows
-  var table = document.getElementById("stocks");
-  var rows = table.getElementsByTagName("tr");
+  // Get all the dynamic tables
+  var tables = document.querySelectorAll(".dynamic-table");
 
   // Get the search query
   var query = searchbar.value.toLowerCase();
 
-  // Loop through each row and hide/show based on search query
-  for (var i = 1; i < rows.length; i++) {
-    var symbol = rows[i].getElementsByTagName("td")[0].textContent.toLowerCase();
-    var demat_id = rows[i].getElementsByTagName("td")[1].textContent.toLowerCase();
-    var quantity = rows[i].getElementsByTagName("td")[2].textContent.toLowerCase();
-    var price = rows[i].getElementsByTagName("td")[3].textContent.toLowerCase();
-    if (symbol.includes(query) || demat_id.includes(query) || quantity.includes(query) || price.includes(query)) {
-      rows[i].style.display = "";
-    } else {
-      rows[i].style.display = "none";
+  // Loop through each table and row and hide/show based on search query
+  for (var i = 0; i < tables.length; i++) {
+    var rows = tables[i].getElementsByTagName("tr");
+
+    for (var j = 1; j < rows.length; j++) {
+      var symbol = rows[j].getElementsByTagName("td")[0].textContent.toLowerCase();
+      var demat_id = rows[j].getElementsByTagName("td")[1].textContent.toLowerCase();
+      var quantity = rows[j].getElementsByTagName("td")[2].textContent.toLowerCase();
+      var price = rows[j].getElementsByTagName("td")[3].textContent.toLowerCase();
+      if (symbol.includes(query) || demat_id.includes(query) || quantity.includes(query) || price.includes(query)) {
+        rows[j].style.display = "";
+      } else {
+        rows[j].style.display = "none";
+      }
     }
   }
 });
+
