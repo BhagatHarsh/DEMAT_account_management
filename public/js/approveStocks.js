@@ -1,3 +1,44 @@
+// Get all the buttons
+var buttons = document.querySelectorAll("button");
+
+for (var i = 0; i < buttons.length; i++) {
+  buttons[i].addEventListener("click", function () {
+    // Get the search string from the URL
+    const searchParams = new URLSearchParams(window.location.search);
+    // Get the "data" parameter from the search string
+    const dataParam = searchParams.get('data');
+    // Parse the JSON data into an object
+    const user = JSON.parse(decodeURIComponent(dataParam));
+    var data = {
+      quantity: parseInt(this.getAttribute("data-quantity")),
+      symbol: this.getAttribute("data-symbol"),
+        user: user
+    };
+    
+    fetch('/approved_stocks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(() => {
+        alert(quantity + " shares of " + this.getAttribute("data-symbol") + " approved successfully for " + this.getAttribute("id") + "!");
+        insertText = "Request has been sent to " + user.broker_name + " successfully."
+        document.getElementById('success-msg').innerHTML = insertText;
+        document.getElementById('success-msg').style.display = 'block';
+        setTimeout(function () {
+          document.getElementById('success-msg').innerHTML = "";
+          document.getElementById('success-msg').style.display = 'none';
+        }, 5000); // 5000 milliseconds = 5 seconds
+      })
+      .catch((error) => {
+        console.error('An error occurred:', error);
+        alert('An error occurred. Please try again later.');
+      });
+  });
+}
+
 // Get the search bar
 var searchbar = document.getElementById("search-bar");
 

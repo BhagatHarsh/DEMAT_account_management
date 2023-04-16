@@ -218,7 +218,7 @@ app.get('/main_table', async (req, res) => {
     const result = await query.getMainTableData(data.broker_name);
     console.log(result)
     res.render(__dirname + '/views/broker_main.ejs', { data: result });
-    res.status(200).send(result);
+    res.status(200).json("success");
   }
   catch (err) {
     console.error(err);
