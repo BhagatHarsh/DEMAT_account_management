@@ -31,6 +31,7 @@ for (var i = 0; i < buttons.length; i++) {
           document.getElementById('success-msg').innerHTML = "";
           document.getElementById('success-msg').style.display = 'none';
         }, 5000); // 5000 milliseconds = 5 seconds
+        location.reload();
       })
       .catch((error) => {
         console.error('An error occurred:', error);
@@ -52,14 +53,12 @@ searchbar.addEventListener("keyup", function () {
 
   // Loop through each table and row and hide/show based on search query
   for (var i = 0; i < tables.length; i++) {
-    var rows = tables[i].getElementsByTagName("tr");
+    var rows = tables[i].querySelectorAll("tbody tr");
 
-    for (var j = 1; j < rows.length; j++) {
-      var symbol = rows[j].getElementsByTagName("td")[0].textContent.toLowerCase();
-      var demat_id = rows[j].getElementsByTagName("td")[1].textContent.toLowerCase();
-      var quantity = rows[j].getElementsByTagName("td")[2].textContent.toLowerCase();
-      var price = rows[j].getElementsByTagName("td")[3].textContent.toLowerCase();
-      if (symbol.includes(query) || demat_id.includes(query) || quantity.includes(query) || price.includes(query)) {
+    for (var j = 0; j < rows.length; j++) {
+      var symbol = rows[j].querySelectorAll("td")[0].textContent.toLowerCase();
+      var quantity = rows[j].querySelectorAll("td")[1].textContent.toLowerCase();
+      if (symbol.includes(query) || quantity.includes(query)) {
         rows[j].style.display = "";
       } else {
         rows[j].style.display = "none";

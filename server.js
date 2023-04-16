@@ -168,7 +168,8 @@ app.post('/approved_stocks', async (req, res) => {
     const data = req.body
     console.log(data)
     // query.approvedStocks(data)
-    res.status(200).send('Success')
+    const encodedData = encodeURIComponent(JSON.stringify(data.user));
+    res.redirect(`/main_table?data=${encodedData}`);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving portfolio');
@@ -192,7 +193,7 @@ app.get('/sell_stock', async (req, res) => {
 
 app.get('/broker_buy', async (req, res) => {
   console.log("get broker buy")
-  try{
+  try {
     const data = JSON.parse(decodeURIComponent(req.query.data));
     const broker_buy_by_exchange = await query.getBrokerBuyDetailsFromName(data.broker_name)
     for (let exchange in broker_buy_by_exchange) {
@@ -201,15 +202,15 @@ app.get('/broker_buy', async (req, res) => {
         let price = await query.getPriceFromSymbol(symbol);
         broker_buy_by_exchange[exchange][i].price = price;
       }
-    }  
-    res.render(__dirname + '/views/broker_buy.ejs', { data:broker_buy_by_exchange });
-  }catch (err) {
+    }
+    res.render(__dirname + '/views/broker_buy.ejs', { data: broker_buy_by_exchange });
+  } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving page');
   }
 });
 
-app.get('/main_table', async (req, res) => { 
+app.get('/main_table', async (req, res) => {
   console.log("post main_table")
   const data = JSON.parse(decodeURIComponent(req.query.data));
   console.log(data)
