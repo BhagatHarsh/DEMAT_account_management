@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.engine('ejs', require('ejs').__express);
+app.engine('ejs', require('ejs').__express); 
 
 
 //get requests
@@ -327,21 +327,24 @@ app.post('/login', async (req, res) => {
 
 app.post('/prices', async (req, res) => {
   console.log("post prices")
-  const companySymbol = req.query.symbol;
-  const newPrice = req.body.price;
-
   console.log(req.query)
+  const data = JSON.parse(decodeURIComponent(req.query.data.replace(/&#34;/g, '"')));
+  const companySymbol = data.symbol;
+  const newPrice = req.body.price;
   console.log(req.body)
+  console.log(data)
   try {
     const updateCompanyQuery = 'UPDATE Companies SET price = $1 WHERE symbol = $2';
     const updateCompanyValues = [newPrice, companySymbol];
-    await pool.query(updateCompanyQuery, updateCompanyValues);
-    res.render(__dirname + '/views/company_last.ejs', { data: req.body });
+    // await pool.query(updateCompanyQuery, updateCompanyValues);
+    console.log("updated")
+    res.render(__dirname + '/views/company_last.ejs', { data:data });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error updating company price');
   }
 });
+
 
 
 
