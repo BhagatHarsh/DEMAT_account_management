@@ -387,13 +387,30 @@ const eventAddBuyStocks = async (data) => {
 
 const eventAddSellStocks = async (data) => {
   try {
-    const query = 'INSERT INTO broker_sell (demat_id, symbol, exchange_name, quantity) VALUES ($1, $2, $3, $4)';
-    const values = [data.user.demat_id, data.symbol, data.exchange, data.quantity];
-    // await pool.query(query, values);
+    // Check if there is already a request in the broker_sell table for the same demat_id, symbol, and exchange_name
+    const checkQuery = 'SELECT * FROM broker_sell WHERE demat_id = $1 AND symbol = $2 AND exchange_name = $3';
+    const checkValues = [data.user.demat_id, data.symbol, data.exchange_name];
+    const { rows } = await pool.query(checkQuery, checkValues);
+    
+    if (rows.length > 0) {
+      // A request already exists, so return false
+      return false;
+    }
+    
+    // Insert the request into the broker_sell table
+    const insertQuery = 'INSERT INTO broker_sell (demat_id, symbol, exchange_name, quantity) VALUES ($1, $2, $3, $4)';
+    const insertValues = [data.user.demat_id, data.symbol, data.exchange_name, data.quantity];
+    await pool.query(insertQuery, insertValues);
+    
+    // Return true to indicate that the request was inserted successfully
+    return true;
+    
   } catch (err) {
     throw err;
   }
 };
+
+
 
 const getbalance = async (data) => {
   try {

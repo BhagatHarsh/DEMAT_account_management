@@ -2,12 +2,12 @@
 var buttons = document.querySelectorAll("button");
 
 for (var i = 0; i < buttons.length; i++) {
-  buttons[i].addEventListener("click", function () {
+  buttons[i].addEventListener("click", async function ()  {
     const quantity = prompt("Enter the quantity of shares you want to sell: ", "1");
-    if (quantity == null || quantity == "") {
+    if (parseInt(quantity) == null || quantity == "") {
       alert("You have cancelled the request.");
       return;
-    } else if (quantity > parseInt(this.getAttribute("data-quantity"))) {
+    } else if (parseInt(quantity) > parseInt(this.getAttribute("data-quantity"))) {
       alert("You cannot sell more shares than you own.");
       return;
     }
@@ -16,35 +16,46 @@ for (var i = 0; i < buttons.length; i++) {
     const user = JSON.parse(decodeURIComponent(dataParam));
     var data = {
       symbol: this.getAttribute("data-symbol"),
-      quantity: quantity,
+      quantity: parseInt(quantity),
       exchange_name: this.id,
       demat_id: user.demat_id,
       user: user
     };
-    fetch('/portfolio', {
+    const success = await sendData(data);
+    console.log(success);
+      if (!success) {
+        alert("Cannot buy the stock at the moment. Broker has not approved yet!");
+      }else{
+          alert(data.quantity + " shares of " + data.symbol + " have been sent for approval to " + user.broker_name + "!");
+          insertText = "Request has been sent to " + user.broker_name + " successfully."
+          document.getElementById('success-msg').innerHTML = insertText;
+          document.getElementById('success-msg').style.display = 'block';
+          setTimeout(function () {
+            document.getElementById('success-msg').innerHTML = "";
+            document.getElementById('success-msg').style.display = 'none';
+          }, 5000); // 5000 milliseconds = 5 seconds
+      }
+  });
+}
+
+const sendData = async (data) => {
+  try {
+    const response = await fetch('/sell_stocks', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json'
       }
-    })
-      .then(() => {
-        alert(data.quantity + " shares of " + data.symbol + " have been sent for approval to " + user.broker_name + "!");
-        insertText = "Request has been sent to " + user.broker_name + " successfully."
-        document.getElementById('success-msg').innerHTML = insertText;
-        document.getElementById('success-msg').style.display = 'block';
-        setTimeout(function () {
-          document.getElementById('success-msg').innerHTML = "";
-          document.getElementById('success-msg').style.display = 'none';
-        }, 5000); // 5000 milliseconds = 5 seconds
-        location.reload();
-      })
-      .catch((error) => {
-        console.error('An error occurred:', error);
-        alert('An error occurred. Please try again later.');
-      });
-  });
+    });
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    console.error('An error occurred:', error);
+    alert('An error occurred. Please try again later.');
+    return null;
+  }
 }
+
 
 // Get the search bar
 var searchbar = document.getElementById("search-bar");

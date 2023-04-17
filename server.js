@@ -131,7 +131,7 @@ app.get('/sell_stocks', async (req, res) => {
         company_name: item.company_name
       }
     });
-    console.log(data);
+    // console.log(data);
     res.render(__dirname + '/views/sell_stocks.ejs', { data });
   } catch (err) {
     console.error(err);
@@ -145,8 +145,8 @@ app.post('/sell_stocks', async (req, res) => {
   try {
     const data = req.body
     console.log(data)
-    query.eventAddSellStocks(data)
-    res.status(200).send('Success')
+    const flag = await query.eventAddSellStocks(data)
+    res.status(200).send(flag);
   }
   catch (err) {
     console.error(err);
