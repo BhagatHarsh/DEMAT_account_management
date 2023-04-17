@@ -338,6 +338,7 @@ app.post('/prices', async (req, res) => {
     const updateCompanyValues = [newPrice, companySymbol];
     await pool.query(updateCompanyQuery, updateCompanyValues);
     console.log("updated")
+    data.price = newPrice;
     res.render(__dirname + '/views/company_last.ejs', { data:data });
   } catch (err) {
     console.error(err);
@@ -350,6 +351,7 @@ app.post('/update_shares', async (req, res) => {
   const companySymbol = data.symbol;
   const newShares = req.body.shares;
   try {
+    console.log(newShares, companySymbol)
     const updateCompanyQuery = 'UPDATE Companies SET no_of_shares = $1 WHERE symbol = $2';
     const updateCompanyValues = [newShares, companySymbol];
     await pool.query(updateCompanyQuery, updateCompanyValues);

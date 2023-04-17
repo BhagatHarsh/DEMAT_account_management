@@ -102,7 +102,7 @@
             </form>
 
             <h4>Update Number of Shares</h4>
-            <form id="update-shares-form" method="POST" action="\update_shares">
+            <form id="update-shares-form" method="POST" action="/update_shares">
               <div class="form-group">
                 <label for="shares">Number of Shares:</label>
                 <input
@@ -130,16 +130,12 @@
               updateSharesForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 const dataString = JSON.stringify(<%- JSON.stringify(data) %>);
-                const encodedData = encodeURIComponent(dataString);
-                const action = `/update-shares?data=${encodedData}`;
-                updateSharesForm.action = action;
                 const sharesInput = document.getElementById('shares');
                 const shares = sharesInput.value;
-                const sharesField = document.createElement('input');
-                sharesField.type = 'hidden';
-                sharesField.name = 'shares';
-                sharesField.value = shares;
-                updateSharesForm.appendChild(sharesField);
+                dataString.shares = shares;
+                const encodedData = encodeURIComponent(dataString);
+                const action = `/update_shares?data=${encodedData}`;
+                updateSharesForm.action = action;
                 updateSharesForm.submit();
               });
             </script>
