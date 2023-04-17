@@ -3,18 +3,16 @@ var buttons = document.querySelectorAll("button");
 
 for (var i = 0; i < buttons.length; i++) {
   buttons[i].addEventListener("click", function () {
-    // Get the search string from the URL
     const searchParams = new URLSearchParams(window.location.search);
-    // Get the "data" parameter from the search string
     const dataParam = searchParams.get('data');
-    // Parse the JSON data into an object
     const user = JSON.parse(decodeURIComponent(dataParam));
     let data = {
       quantity: parseInt(this.getAttribute("data-quantity")),
       symbol: this.getAttribute("data-symbol"),
-      user: user
+      user: user,
+      type: this.getAttribute("data-type")
     };
-
+    console.log(data);    
     fetch('/approved_stocks', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -42,19 +40,11 @@ for (var i = 0; i < buttons.length; i++) {
 
 // Get the search bar
 var searchbar = document.getElementById("search-bar");
-
-// Add a keyup event listener to the search bar
 searchbar.addEventListener("keyup", function () {
-  // Get all the dynamic tables
   var tables = document.querySelectorAll(".dynamic-table");
-
-  // Get the search query
   var query = searchbar.value.toLowerCase();
-
-  // Loop through each table and row and hide/show based on search query
   for (var i = 0; i < tables.length; i++) {
     var rows = tables[i].querySelectorAll("tbody tr");
-
     for (var j = 0; j < rows.length; j++) {
       var symbol = rows[j].querySelectorAll("td")[0].textContent.toLowerCase();
       var quantity = rows[j].querySelectorAll("td")[1].textContent.toLowerCase();

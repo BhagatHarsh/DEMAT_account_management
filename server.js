@@ -195,8 +195,12 @@ app.post('/approved_stocks', async (req, res) => {
   console.log("post approvedStocks")
   try {
     const data = req.body
-    console.log(data)
-    query.approvedStocks(data.symbol, data.user.broker_id)
+    console.log("/approved_stocks", data)
+    if(data.type === "buyer"){
+      query.approvedStocks(data.symbol, data.user.broker_id)
+    }else if(data.type === "seller"){
+      query.sellingStocks(data.symbol, data.user.broker_id)
+    }
     res.status(200).send("sucess")
   } catch (err) {
     console.error(err);
@@ -272,7 +276,7 @@ app.get('/main_table', async (req, res) => {
   // console.log(data)
   try {
     const data = await query.getMainTableData(data1.broker_name);
-    console.log(data)
+    // console.log(data)
     res.render(__dirname + '/views/broker_main.ejs', { "buyer" : data.buyer, "seller" : data.seller });
   }
   catch (err) {
