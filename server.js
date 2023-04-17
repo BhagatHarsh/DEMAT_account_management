@@ -336,7 +336,7 @@ app.post('/prices', async (req, res) => {
   try {
     const updateCompanyQuery = 'UPDATE Companies SET price = $1 WHERE symbol = $2';
     const updateCompanyValues = [newPrice, companySymbol];
-    // await pool.query(updateCompanyQuery, updateCompanyValues);
+    await pool.query(updateCompanyQuery, updateCompanyValues);
     console.log("updated")
     res.render(__dirname + '/views/company_last.ejs', { data:data });
   } catch (err) {
@@ -345,6 +345,21 @@ app.post('/prices', async (req, res) => {
   }
 });
 
+app.post('/update_shares', async (req, res) => {
+  const data = JSON.parse(decodeURIComponent(req.query.data.replace(/&#34;/g, '"')));
+  const companySymbol = data.symbol;
+  const newShares = req.body.shares;
+  try {
+    const updateCompanyQuery = 'UPDATE Companies SET no_of_shares = $1 WHERE symbol = $2';
+    const updateCompanyValues = [newShares, companySymbol];
+    await pool.query(updateCompanyQuery, updateCompanyValues);
+    // res.redirect(`/dashboard/${companySymbol}`);
+    res.send(data)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating company shares');
+  }
+});
 
 
 
