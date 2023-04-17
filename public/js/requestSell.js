@@ -17,7 +17,7 @@ for (var i = 0; i < buttons.length; i++) {
     var data = {
       symbol: this.getAttribute("data-symbol"),
       quantity: parseInt(quantity),
-      exchange_name: this.id,
+      exchange_name: this.getAttribute("data-exchange"),
       demat_id: user.demat_id,
       user: user
     };

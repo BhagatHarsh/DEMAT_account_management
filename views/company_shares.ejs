@@ -86,21 +86,6 @@
           <h2>Company Dashboard</h2>
           <h3><%= data.company_name %> (<%= data.symbol %>)</h3>
           <div id="price-form">
-            <h4>Add Price</h4>
-            <form id="add-price-form" method="POST" action="/prices">
-              <div class="form-group">
-                <label for="price">Price:</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  id="price"
-                  name="price"
-                  required
-                />
-              </div>
-              <button type="submit" class="btn btn-primary">Add Price</button>
-            </form>
-
             <h4>Update Number of Shares</h4>
             <form id="update-shares-form" method="POST" action="/update_shares">
               <div class="form-group">
@@ -109,7 +94,7 @@
                   type="number"
                   class="form-control"
                   id="shares"
-                  name="shares"
+                  name="no_of_shares"
                   required
                 />
               </div>
@@ -118,21 +103,13 @@
               </button>
             </form>
             <script>
-              const addPriceForm = document.getElementById('add-price-form');
-              addPriceForm.addEventListener('submit', (event) => {
-                const dataString = JSON.stringify(<%- JSON.stringify(data) %>);
-                const encodedData = encodeURIComponent(dataString);
-                const action = `/prices?data=${encodedData}`;
-                addPriceForm.action = action;
-              });
-
               const updateSharesForm = document.getElementById('update-shares-form');
               updateSharesForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 const dataString = JSON.stringify(<%- JSON.stringify(data) %>);
                 const sharesInput = document.getElementById('shares');
                 const shares = sharesInput.value;
-                dataString.shares = shares;
+                dataString.no_of_shares = shares;
                 const encodedData = encodeURIComponent(dataString);
                 const action = `/update_shares?data=${encodedData}`;
                 updateSharesForm.action = action;

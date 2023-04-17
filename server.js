@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.engine('ejs', require('ejs').__express); 
+app.engine('ejs', require('ejs').__express);
 
 
 //get requests
@@ -240,6 +240,25 @@ app.get('/broker_buy', async (req, res) => {
   }
 });
 
+app.get('/broker_sell', async (req, res) => {
+  console.log("get broker sell")
+  try {
+    const data = JSON.parse(decodeURIComponent(req.query.data));
+    const broker_buy_by_exchange = await query.getBrokerBuyDetailsFromName(data.broker_name)
+    for (let exchange in broker_buy_by_exchange) {
+      for (let i = 0; i < broker_buy_by_exchange[exchange].length; i++) {
+        let symbol = broker_buy_by_exchange[exchange][i].symbol;
+        let price = await query.getPriceFromSymbol(symbol);
+        broker_buy_by_exchange[exchange][i].price = price;
+      }
+    }
+    res.render(__dirname + '/views/broker_buy.ejs', { data: broker_buy_by_exchange });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error retrieving page');
+  }
+});
+
 app.get('/main_table', async (req, res) => {
   console.log("post main_table")
   const data = JSON.parse(decodeURIComponent(req.query.data));
@@ -291,7 +310,7 @@ app.post('/login', async (req, res) => {
           } else if (!isMatch) {
             res.status(401).send('Invalid login credentials');
           } else {
-            res.render(__dirname + '/views/company_page1.ejs', { data });
+            res.render(__dirname + '/views/dashboard_company.ejs', { data });
           }
         });
       } catch (err) {
@@ -325,6 +344,13 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.get('/prices', async (req, res) => {
+  console.log("get prices")
+  const data = JSON.parse(decodeURIComponent(req.query.data));
+  console.log(data)
+  res.render(__dirname + '/views/company_prices.ejs', { data: data });
+});
+
 app.post('/prices', async (req, res) => {
   console.log("post prices")
   console.log(req.query)
@@ -339,24 +365,31 @@ app.post('/prices', async (req, res) => {
     await pool.query(updateCompanyQuery, updateCompanyValues);
     console.log("updated")
     data.price = newPrice;
-    res.render(__dirname + '/views/company_last.ejs', { data:data });
+    res.render(__dirname + '/views/Update_price.ejs', { data: data });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error updating company price');
   }
 });
 
+app.get('/update_shares', async (req, res) => {
+  console.log("get update_shares")
+  const data = JSON.parse(decodeURIComponent(req.query.data));
+  console.log(data)
+  res.render(__dirname + '/views/company_shares.ejs', { data: data });
+});
+
 app.post('/update_shares', async (req, res) => {
   const data = JSON.parse(decodeURIComponent(req.query.data.replace(/&#34;/g, '"')));
   const companySymbol = data.symbol;
-  const newShares = req.body.shares;
+  const newShares = req.body.no_of_shares;
   try {
-    console.log(newShares, companySymbol)
+    console.log(req.body)
     const updateCompanyQuery = 'UPDATE Companies SET no_of_shares = $1 WHERE symbol = $2';
     const updateCompanyValues = [newShares, companySymbol];
     await pool.query(updateCompanyQuery, updateCompanyValues);
-    // res.redirect(`/dashboard/${companySymbol}`);
-    res.send(data)
+    data.no_of_shares = newShares;
+    res.render(__dirname + '/views/Update_share.ejs', { data: data });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error updating company shares');

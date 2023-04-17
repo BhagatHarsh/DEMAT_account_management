@@ -49,6 +49,7 @@
                   <th>Quantity</th>
                   <th>Price</th>
                   <th>Company Name</th>
+                  <th>Exchange Name</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -59,6 +60,7 @@
                   <td><%= data[i].quantity %></td>
                   <td><%= data[i].price %></td>
                   <td><%= data[i].company_name %></td>
+                  <td><%= data[i].exchange_name %></td>
                   <td>
                     <button
                       type="button"
@@ -67,6 +69,7 @@
                       data-quantity="<%= data[i].quantity %>"
                       data-price="<%= data[i].price %>"
                       id="<%= data[i].company_name %>"
+                      data-exchange="<%= data[i].exchange_name %>"
                     >
                       Sell
                     </button>

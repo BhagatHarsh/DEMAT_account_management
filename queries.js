@@ -308,7 +308,7 @@ const registerBroker = async (data) => {
 const getCompanyByGstNumber = async (gstNumber) => {
   try {
     const queryText = `
-      SELECT ci.gst_number, c.symbol, c.company_name, c.price, ci.password
+      SELECT ci.gst_number, c.symbol, c.company_name, c.price, ci.password, c.no_of_shares
       FROM company_info ci
       JOIN companies c ON ci.symbol = c.symbol
       WHERE ci.gst_number = $1
@@ -432,6 +432,30 @@ const getCompaniesData = async () => {
   }
 };
 
+const getBrokerSellDetailsFromName = async (broker_name) => {
+  try {
+  const query = 'SELECT * FROM broker_sell JOIN demat_broker ON broker_sell.demat_id = demat_broker.demat_id WHERE broker_name = $1';
+  const values = [broker_name];
+  const result = await pool.query(query, values);
+  
+  const data = {};
+  result.rows.forEach(row => {
+    const exchangeName = row.exchange_name;
+    const rowWithoutExchangeName = { ...row };
+    delete rowWithoutExchangeName.exchange_name;
+    if (data[exchangeName]) {
+      data[exchangeName].push(rowWithoutExchangeName);
+    } else {
+      data[exchangeName] = [rowWithoutExchangeName];
+    }
+  });
+  
+  return data;
+  } catch (err) {
+  throw err;
+  }
+  };
+
 const getBrokerBuyDetailsFromName = async (broker_name) => {
   try {
     const query = 'SELECT * FROM broker_buy JOIN demat_broker ON broker_buy.demat_id = demat_broker.demat_id WHERE broker_name = $1';
@@ -528,4 +552,5 @@ module.exports = {
   approvedStocks, 
   eventAddSellStocks,
   getSharePurchased,
+  getBrokerSellDetailsFromName,
 };
