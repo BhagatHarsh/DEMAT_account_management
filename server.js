@@ -336,7 +336,7 @@ app.post('/prices', async (req, res) => {
     const updateCompanyQuery = 'UPDATE Companies SET price = $1 WHERE symbol = $2';
     const updateCompanyValues = [newPrice, companySymbol];
     await pool.query(updateCompanyQuery, updateCompanyValues);
-    res.redirect('/');
+    res.render(__dirname + '/views/company_last.ejs', { data: req.body });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error updating company price');

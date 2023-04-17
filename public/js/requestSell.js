@@ -3,15 +3,20 @@ var buttons = document.querySelectorAll("button");
 
 for (var i = 0; i < buttons.length; i++) {
   buttons[i].addEventListener("click", function () {
-    // Get the search string from the URL
+    const quantity = prompt("Enter the quantity of shares you want to sell: ", "1");
+    if (quantity == null || quantity == "") {
+      alert("You have cancelled the request.");
+      return;
+    } else if (quantity > parseInt(this.getAttribute("data-quantity"))) {
+      alert("You cannot sell more shares than you own.");
+      return;
+    }
     const searchParams = new URLSearchParams(window.location.search);
-    // Get the "data" parameter from the search string
     const dataParam = searchParams.get('data');
-    // Parse the JSON data into an object
     const user = JSON.parse(decodeURIComponent(dataParam));
     var data = {
       symbol: this.getAttribute("data-symbol"),
-      quantity: parseInt(this.getAttribute("data-quantity")),
+      quantity: quantity,
       exchange_name: this.id,
       demat_id: user.demat_id,
       user: user
@@ -47,7 +52,7 @@ var searchbar = document.getElementById("search-bar");
 // Add a keyup event listener to the search bar
 searchbar.addEventListener("keyup", function () {
   // Get the table and table rows
-  var table = document.getElementById("stocks");
+  var table = document.querySelector("table");
   var rows = table.getElementsByTagName("tr");
 
   // Get the search query
@@ -55,10 +60,24 @@ searchbar.addEventListener("keyup", function () {
 
   // Loop through each row and hide/show based on search query
   for (var i = 1; i < rows.length; i++) {
-    var symbol = rows[i].getElementsByTagName("td")[0].textContent.toLowerCase();
-    var instrumentName = rows[i].getElementsByTagName("td")[1].textContent.toLowerCase();
-    var price = rows[i].getElementsByTagName("td")[2].textContent.toLowerCase();
-    if (symbol.includes(query) || instrumentName.includes(query) || price.includes(query)) {
+    var symbol = rows[i]
+      .getElementsByTagName("td")[0]
+      .textContent.toLowerCase();
+    var quantity = rows[i]
+      .getElementsByTagName("td")[1]
+      .textContent.toLowerCase();
+    var price = rows[i]
+      .getElementsByTagName("td")[2]
+      .textContent.toLowerCase();
+    var companyName = rows[i]
+      .getElementsByTagName("td")[3]
+      .textContent.toLowerCase();
+    if (
+      symbol.includes(query) ||
+      quantity.includes(query) ||
+      price.includes(query) ||
+      companyName.includes(query)
+    ) {
       rows[i].style.display = "";
     } else {
       rows[i].style.display = "none";

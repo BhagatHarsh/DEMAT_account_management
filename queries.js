@@ -389,6 +389,7 @@ const eventAddSellStocks = async (data) => {
   try {
     const query = 'INSERT INTO broker_sell (demat_id, symbol, exchange_name, quantity) VALUES ($1, $2, $3, $4)';
     const values = [data.user.demat_id, data.symbol, data.exchange, data.quantity];
+    // await pool.query(query, values);
   } catch (err) {
     throw err;
   }
