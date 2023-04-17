@@ -74,7 +74,7 @@ const approvedStocks = async (symbol, brokerId) => {
       FROM broker_account
       WHERE broker_id = $1
     `, [brokerId]);
-    const brokerCommissionPercent = (brokerAccountRows[0].commission);
+    const brokerCommissionPercent = brokerAccountRows[0].commission;
 
     console.log('Broker Commission: ', brokerCommissionPercent);
     console.log('Broker ID: ', brokerId);
@@ -182,6 +182,15 @@ const getExchangeNamesFromBrokerId = async (broker_id) => {
   } catch (err) {
     throw err;
   }
+}
+
+const getTotalCompanyStocks = async (company_name) => {
+  const query = `
+  select no_of_shares from companies c where c.company_name = $1;
+  `;
+
+  const result = await pool.query(query, [company_name]);
+  return result.rows[0].no_of_shares;
 }
 
 const getExchangeNames = async () => {
@@ -553,4 +562,5 @@ module.exports = {
   eventAddSellStocks,
   getSharePurchased,
   getBrokerSellDetailsFromName,
+  getTotalCompanyStocks,
 };

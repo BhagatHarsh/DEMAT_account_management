@@ -173,16 +173,23 @@ app.get('/buy_stock', async (req, res) => {
 app.post('/buy_stock', async (req, res) => {
   console.log("post buy_stock")
   try {
-    console.log("post buy_stock")
-    const data = req.body
-    query.eventAddBuyStocks(data)
-    // console.log(data)
-    res.status(200).send('Success')
+    const data = req.body;
+    console.log(data);
+    const totalCompanyStocks = await query.getTotalCompanyStocks(data.company_name);
+    if (data.quantity > totalCompanyStocks) {
+      // There are not enough stocks available to buy
+      return res.status(200).json({ "message": 'Not enough stocks available to buy' });
+    }
+
+    // Add the stocks to the user's portfolio
+    await query.eventAddBuyStocks(data);
+
+    res.status(200).json({ "message": 'Request sent to ' + data.user.broker_name + ' successfully!' });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error retrieving portfolio');
+    res.status(500).send('Error buying stock');
   }
-})
+});
 
 app.post('/approved_stocks', async (req, res) => {
   console.log("post approvedStocks")
@@ -244,7 +251,7 @@ app.get('/broker_sell', async (req, res) => {
   console.log("get broker sell")
   try {
     const data = JSON.parse(decodeURIComponent(req.query.data));
-    const broker_buy_by_exchange = await query.getBrokerBuyDetailsFromName(data.broker_name)
+    const broker_buy_by_exchange = await query.getBrokerSellDetailsFromName(data.broker_name)
     for (let exchange in broker_buy_by_exchange) {
       for (let i = 0; i < broker_buy_by_exchange[exchange].length; i++) {
         let symbol = broker_buy_by_exchange[exchange][i].symbol;
@@ -252,7 +259,7 @@ app.get('/broker_sell', async (req, res) => {
         broker_buy_by_exchange[exchange][i].price = price;
       }
     }
-    res.render(__dirname + '/views/broker_buy.ejs', { data: broker_buy_by_exchange });
+    res.render(__dirname + '/views/broker_sell.ejs', { data: broker_buy_by_exchange });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving page');

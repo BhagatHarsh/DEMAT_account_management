@@ -2,7 +2,7 @@
 var buttons = document.querySelectorAll("button");
 
 for (var i = 0; i < buttons.length; i++) {
-  buttons[i].addEventListener("click", function () {
+  buttons[i].addEventListener("click", async function () {
     var quantity = prompt("Enter quantity for button " + this.id + ":");
     // Get the search string from the URL
     const searchParams = new URLSearchParams(window.location.search);
@@ -29,31 +29,30 @@ for (var i = 0; i < buttons.length; i++) {
     }else if (quantity*data.price > user.balance) {
       alert("You do not have enough balance to buy this stock.");
       return;
+    }else{
+      const word = await sendData(data);
+      alert(word);
     }
-    fetch('/buy_stock', {
+  });
+}
+
+const sendData = async (data) => {
+  try {
+    const response = await fetch('/buy_stock', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json'
       }
-    })
-      .then(() => {
-        alert(quantity + " shares of " + this.id + " bought successfully!");
-        insertText = "Request has been sent to " + user.broker_name + " successfully."
-        document.getElementById('success-msg').innerHTML = insertText;
-        document.getElementById('success-msg').style.display = 'block';
-        setTimeout(function () {
-          document.getElementById('success-msg').innerHTML = "";
-          document.getElementById('success-msg').style.display = 'none';
-        }, 5000); // 5000 milliseconds = 5 seconds
-      })
-      .catch((error) => {
-        console.error('An error occurred:', error);
-        alert('An error occurred. Please try again later.');
-      });
-  });
+    });
+    const responseData = await response.json();
+    console.log(responseData);
+    return responseData['message'];
+  } catch (error) {
+    console.error('An error occurred:', error);
+    return error;
+  }
 }
-
 // Get the search bar
 var searchbar = document.getElementById("search-bar");
 
