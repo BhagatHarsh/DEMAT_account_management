@@ -341,8 +341,20 @@ const getMainTableData = async (broker_name) => {
     WHERE broker.broker_name = $1
     GROUP BY broker_buy.symbol, companies.price;
     `;
+    const query_1= `
+    SELECT broker_sell.symbol, SUM(broker_sell.quantity) as total_quantity, companies.price
+    FROM broker_sell
+    JOIN demat_broker ON broker_sell.demat_id = demat_broker.demat_id
+    JOIN broker ON demat_broker.broker_name = broker.broker_name
+    JOIN companies ON broker_sell.symbol = companies.symbol
+    WHERE broker.broker_name = $1
+    GROUP BY broker_sell.symbol, companies.price;
+    `;
     const result = await pool.query(query, [broker_name]);
-    return result.rows;
+    const result_1 = await pool.query(query_1, [broker_name]);
+    return {
+      "buyer" : result.rows, "seller":result_1.rows
+    };
   } catch (err) {
     throw err;
   }

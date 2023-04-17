@@ -268,12 +268,12 @@ app.get('/broker_sell', async (req, res) => {
 
 app.get('/main_table', async (req, res) => {
   console.log("post main_table")
-  const data = JSON.parse(decodeURIComponent(req.query.data));
+  const data1 = JSON.parse(decodeURIComponent(req.query.data));
   // console.log(data)
   try {
-    const result = await query.getMainTableData(data.broker_name);
-    // console.log(result)
-    res.render(__dirname + '/views/broker_main.ejs', { data: result });
+    const data = await query.getMainTableData(data1.broker_name);
+    console.log(data)
+    res.render(__dirname + '/views/broker_main.ejs', { "buyer" : data.buyer, "seller" : data.seller });
   }
   catch (err) {
     console.error(err);
