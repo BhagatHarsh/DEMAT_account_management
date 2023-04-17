@@ -55,36 +55,37 @@
 					</span>
 
 					<span class="login100-form-title p-b-34 p-t-27" style ="font-size:28px">
-						Welcome, <%= data.company_name  %> !
+						Welcome, <%= data.broker_name  %> !
 					</span>
 
 					<span class="login100-form-title p-b-34 p-t-10" style="font-size:16px">
-						Symbol: <%= data.symbol %>
+						Broker ID: <%= data.broker_id %>
 					</span>
 					
 					<span class="login100-form-title p-b-34 p-t-10" style="font-size:16px">
-						GST Number: <%= data.gst_number %>
+						Account Number: <%= data.account_number %>
 					</span>
 
 					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
-						Price: <%= data.price %>
-					</span>
-
-					<span class="login100-form-title p-b-34 p-t-10 " style="font-size:16px">
-						Number of shares: <%= data.no_of_shares %>
+						Balance: <%= data.balance %>
 					</span>
 
 
 
 				</form>
-        <a href="/prices?data=<%= encodeURIComponent(JSON.stringify(data));%>">
+        <a href="/main_table?data=<%= encodeURIComponent(JSON.stringify(data));%>">
           <div class="text-center p-t-15">
-            <button class="btn btn-primary">Update share price</button>
+            <button class="btn btn-primary">View main table</button>
           </div>
         </a>
-        <a href="/update_shares?data=<%= encodeURIComponent(JSON.stringify(data));%>">
+        <a href="/broker_buy?data=<%= encodeURIComponent(JSON.stringify(data));%>">
           <div class="text-center p-t-15">
-            <button class="btn btn-primary">Update number of shares</button>
+            <button class="btn btn-primary">View Buy</button>
+          </div>
+        </a>
+        <a href="/sell_stock?data=<%= encodeURIComponent(JSON.stringify(data));%>">
+          <div class="text-center p-t-15">
+            <button class="btn btn-primary">View Sell</button>
           </div>
         </a>
 			</div>
