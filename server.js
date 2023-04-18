@@ -162,7 +162,7 @@ app.get('/buy_stock', async (req, res) => {
     const data = await query.getCompaniesData();
     const exchanges = await query.getExchangeNamesFromBrokerId(user.broker_id);
     data.exchanges = exchanges.map(exchange => exchange.exchange_name);
-    console.log(data);
+    // console.log(data);
     res.render(__dirname + '/views/buy_stock.ejs', { data });
   } catch (err) {
     console.error(err);

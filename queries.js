@@ -200,11 +200,19 @@ const sellingStocks = async (symbol, brokerId) => {
         )
       `, [commissionAmount, brokerId]);
 
-      // Insert the transaction into the share_purchased table
+      // Call the stored procedure to update the quantity of shares in the companies table
       await pool.query(`
-      INTO share_purchased (demat_id, symbol, exchange_name, no_of_shares)
-      VALUES ($1, $2, $3, $4)
-    `, [demat_id, symbol, exchange_name, quantity]);
+        CALL update_company_quantity($1, $2)
+      `, [symbol, quantity]);
+
+      // Update the quantity of shares in the share_purchased table
+      await pool.query(`
+        UPDATE share_purchased
+        SET no_of_shares = no_of_shares - $1
+        WHERE symbol = $2 AND demat_id = $3 AND exchange_name = $4
+      `, [quantity, symbol, demat_id, exchange_name]);
+
+      
     }
   } catch (err) {
     throw err;
