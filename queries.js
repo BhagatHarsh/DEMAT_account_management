@@ -124,6 +124,11 @@ const approvedStocks = async (symbol, brokerId) => {
         )
       `, [commissionAmount, brokerId]);
 
+      // Call the stored procedure to update the quantity of shares in the companies table
+      await pool.query(`
+        CALL decrement_company_quantity($1, $2)
+      `, [symbol, quantity]);
+
       // Insert the transaction into the share_purchased table
       await pool.query(`
       INSERT INTO share_purchased (demat_id, symbol, exchange_name, no_of_shares)
@@ -202,7 +207,7 @@ const sellingStocks = async (symbol, brokerId) => {
 
       // Call the stored procedure to update the quantity of shares in the companies table
       await pool.query(`
-        CALL update_company_quantity($1, $2)
+        CALL increment_company_quantity($1, $2)
       `, [symbol, quantity]);
 
       // Update the quantity of shares in the share_purchased table
@@ -214,7 +219,6 @@ const sellingStocks = async (symbol, brokerId) => {
 
       //Delete the row from broker_sell table
       await pool.query(`
-          
       DELETE FROM broker_sell
       WHERE demat_id = $1 AND symbol = $2 AND exchange_name = $3
       `, [demat_id, symbol, exchange_name]);
