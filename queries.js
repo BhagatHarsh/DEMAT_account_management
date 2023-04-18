@@ -15,7 +15,7 @@ const getUserByDematId = async (demat_id) => {
       WHERE d.demat_id = $1
     `;
     const result = await pool.query(queryText, [demat_id]);
-
+    console.log(result.rows[0]);
     if (result.rows.length === 0) {
       throw new Error('User not found');
     }
@@ -68,6 +68,19 @@ const approvedStocks = async (symbol, brokerId) => {
       WHERE symbol = $1
     `, [symbol]);
 
+    const totalQuantity = await pool.query(
+      `
+      SELECT SUM(quantity) AS total_quantity from broker_buy WHERE symbol = $1
+      `, [symbol]
+    )
+    
+    const total_quantity = (totalQuantity.rows[0].total_quantity)
+
+      // Call the stored procedure to update the quantity of shares in the companies table
+      await pool.query(`
+      CALL process_trade($1, $2)
+    `, [symbol, total_quantity]);
+
     // Get the commission for the broker from the broker_account table
     const { rows: brokerAccountRows } = await pool.query(`
       SELECT commission
@@ -79,20 +92,34 @@ const approvedStocks = async (symbol, brokerId) => {
     console.log('Broker Commission: ', brokerCommissionPercent);
     console.log('Broker ID: ', brokerId);
     console.log("brokerBuyRows: ", brokerBuyRows);
+    // Get the price of the symbol from the companies table
+    const { rows: companyRows } = await pool.query(`
+      SELECT price
+      FROM companies
+      WHERE symbol = $1
+    `, [symbol]);
+    const price = companyRows[0].price;
+
+    // Calculate the amount to be deducted from the demat account balance
+    const amount = price * total_quantity  ;
+    const commissionAmount = amount * (brokerCommissionPercent / 100);
+    const totalAmount = amount + commissionAmount;
+
+    // Increment the broker's account balance by the commission amount
+    await pool.query(`
+    UPDATE balance
+    SET balance = balance + $1
+    WHERE account_number IN (
+      SELECT account_number
+      FROM broker_account
+      WHERE broker_id = $2
+    )
+    `, [commissionAmount, brokerId]);
+
+
+
     // For each demat ID, calculate the amount to be deducted from the balance
     for (const { demat_id, quantity, exchange_name } of brokerBuyRows) {
-      // Get the price of the symbol from the companies table
-      const { rows: companyRows } = await pool.query(`
-        SELECT price
-        FROM companies
-        WHERE symbol = $1
-      `, [symbol]);
-      const price = companyRows[0].price;
-
-      // Calculate the amount to be deducted from the demat account balance
-      const amount = price * quantity;
-      const commissionAmount = amount * (brokerCommissionPercent / 100);
-      const totalAmount = amount + commissionAmount;
 
       console.log('Demat ID: ', demat_id);
       console.log('Symbol: ', symbol);
@@ -112,29 +139,14 @@ const approvedStocks = async (symbol, brokerId) => {
         WHERE demat_id = $2
       )
       `, [totalAmount, demat_id]);
-
-      // Increment the broker's account balance by the commission amount
-      await pool.query(`
-        UPDATE balance
-        SET balance = balance + $1
-        WHERE account_number IN (
-          SELECT account_number
-          FROM broker_account
-          WHERE broker_id = $2
-        )
-      `, [commissionAmount, brokerId]);
-
-      // Call the stored procedure to update the quantity of shares in the companies table
-      await pool.query(`
-        CALL process_trade($1)
-      `, [symbol]);
-
+      
       // Insert the transaction into the share_purchased table
       await pool.query(`
       INSERT INTO share_purchased (demat_id, symbol, exchange_name, no_of_shares)
       VALUES ($1, $2, $3, $4)
-    `, [demat_id, symbol, exchange_name, quantity]);
+      `, [demat_id, symbol, exchange_name, quantity]);
     }
+
   } catch (err) {
     throw err;
   }
@@ -299,6 +311,12 @@ const registerTrader = async (data) => {
     // Hash the user's password before storing it in the database
     const hashedpassword = await bcrypt.hash(data.password, 10);
 
+    // Insert bank data into the Banks table
+    const insertBankQuery = 'INSERT INTO Banks (bank_name, ifsc_code) VALUES ($1, $2) ON CONFLICT (ifsc_code) DO NOTHING';
+    const insertBankValues = [data.bank_name, data.ifsc_code]
+    await pool.query(insertBankQuery, insertBankValues);
+
+
     // Insert the user's registration data into the users table
     const insertUserQuery = 'INSERT INTO users (pan_number, first_name, last_name, ifsc_code, pincode, password) VALUES ($1, $2, $3, $4, $5, $6)';
     const insertUserValues = [data.pan_number, data.first_name, data.last_name, data.ifsc_code, data.pincode, hashedpassword];
@@ -309,12 +327,6 @@ const registerTrader = async (data) => {
     const insertPhoneValues = [data.pan_number, data.phone_number];
     await pool.query(insertPhoneQuery, insertPhoneValues);
 
-    // Insert bank data into the Banks table
-    const insertBankQuery = 'INSERT INTO Banks (bank_name, ifsc_code) VALUES ($1, $2) ON CONFLICT (ifsc_code) DO NOTHING';
-    const insertBankValues = [data.bank_name, data.ifsc_code]
-    await pool.query(insertBankQuery, insertBankValues);
-
-
     // Insert demat data into the Demat table
     const dematID = dematgen.generateDematID();
     const insertDematQuery = 'INSERT INTO Demat (demat_id, pan_number) VALUES ($1, $2)';
@@ -322,8 +334,8 @@ const registerTrader = async (data) => {
     await pool.query(insertDematQuery, insertDematValues);
 
     // Insert demat details into the Demat_details table
-    const insertDematDetailsQuery = 'INSERT INTO Demat_details (demat_id, account_number, ifsc_code) VALUES ($1, $2, $3)';
-    const insertDematDetailsValues = [dematID, data.account_number, data.ifsc_code];
+    const insertDematDetailsQuery = 'INSERT INTO Demat_details (demat_id, account_number) VALUES ($1, $2)';
+    const insertDematDetailsValues = [dematID, data.account_number];
     await pool.query(insertDematDetailsQuery, insertDematDetailsValues);
 
     const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
@@ -604,11 +616,8 @@ const resetDatabase = async () => {
   try {
     const tables = [
       'phone_number',
-      // 'mutual_fund_invest',
-      // 'mf_purchased',
       'share_purchased',
       // 'broker_exchange',
-      'broker_check',
       'listing',
       // 'company_info',
       // 'companies',
