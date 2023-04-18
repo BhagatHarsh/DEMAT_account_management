@@ -414,6 +414,17 @@ app.get('/', (req, res) => {
   res.render(__dirname + '/views/controller.ejs')
 })
 
+
+
+app.get('/db', async (req, res) => {
+  try {
+    query.printFunctionsProceduresTriggers();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal server error');
+  }
+});
+
 app.get('/*', async (req, res) => {
   console.log("get /*")
   res.render(__dirname + '/views/404.ejs', { req, title: "Page Not Found" })

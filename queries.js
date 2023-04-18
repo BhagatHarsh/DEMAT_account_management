@@ -168,7 +168,7 @@ const sellingStocks = async (symbol, brokerId) => {
       // Calculate the amount to be deducted from the demat account balance
       const amount = price * quantity;
       const commissionAmount = amount * (brokerCommissionPercent / 100);
-      const totalAmount = amount + commissionAmount;
+      const totalAmount = amount - commissionAmount;
 
       console.log('Demat ID: ', demat_id);
       console.log('Symbol: ', symbol);
@@ -181,7 +181,7 @@ const sellingStocks = async (symbol, brokerId) => {
       // Deduct the amount from the demat account balance
       await pool.query(`
       UPDATE balance
-      SET balance = balance - $1
+      SET balance = balance + $1
       WHERE account_number IN (
         SELECT account_number
         FROM demat_details
@@ -211,8 +211,6 @@ const sellingStocks = async (symbol, brokerId) => {
         SET no_of_shares = no_of_shares - $1
         WHERE symbol = $2 AND demat_id = $3 AND exchange_name = $4
       `, [quantity, symbol, demat_id, exchange_name]);
-
-      
     }
   } catch (err) {
     throw err;
@@ -627,7 +625,55 @@ const resetDatabase = async () => {
   }
 };
 
+const printFunctionsProceduresTriggers = async () => {
+  try {
+    // Get the list of all functions in the database
+    const { rows: functionRows } = await pool.query(`
+      SELECT n.nspname AS schema_name, p.proname AS function_name, pg_get_function_identity_arguments(p.oid) AS arguments, p.prorettype::regtype AS return_type
+      FROM pg_proc p 
+      JOIN pg_namespace n ON p.pronamespace = n.oid
+      WHERE n.nspname = 'public'
+    `);
 
+    console.log('Functions:');
+    console.log('----------');
+    functionRows.forEach(row => {
+      console.log(`${row.schema_name}.${row.function_name}(${row.arguments}) RETURNS ${row.return_type}`);
+    });
+    console.log('');
+
+    // Get the list of all procedures in the database
+    const { rows: procedureRows } = await pool.query(`
+      SELECT n.nspname AS schema_name, p.proname AS procedure_name, pg_get_function_identity_arguments(p.oid) AS arguments
+      FROM pg_proc p 
+      JOIN pg_namespace n ON p.pronamespace = n.oid
+      WHERE n.nspname = 'public' AND p.prorettype = 'pg_catalog.void'::regtype
+    `);
+
+    console.log('Procedures:');
+    console.log('-----------');
+    procedureRows.forEach(row => {
+      console.log(`${row.schema_name}.${row.procedure_name}(${row.arguments})`);
+    });
+    console.log('');
+
+    // Get the list of all triggers in the database
+    const { rows: triggerRows } = await pool.query(`
+      SELECT tgname AS name, tgtype AS type, tgrelid::regclass AS table_name, tgdeferrable AS deferrable, tginitdeferred AS initially_deferred
+      FROM pg_trigger
+      WHERE tgconstraint = false
+    `);
+
+    console.log('Triggers:');
+    console.log('---------');
+    triggerRows.forEach(row => {
+      console.log(`${row.name} ${row.type} ON ${row.table_name} DEFERRABLE=${row.deferrable} INITIALLY DEFERRED=${row.initially_deferred}`);
+    });
+    console.log('');
+  } catch (err) {
+    throw err;
+  }
+};
 
 
 
@@ -658,4 +704,5 @@ module.exports = {
   getBrokerSellDetailsFromName,
   getTotalCompanyStocks,
   sellingStocks,
+  printFunctionsProceduresTriggers,
 };
