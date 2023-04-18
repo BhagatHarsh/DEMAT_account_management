@@ -78,8 +78,8 @@ const approvedStocks = async (symbol, brokerId) => {
 
       // Call the stored procedure to update the quantity of shares in the companies table
       await pool.query(`
-      CALL process_trade($1, $2)
-    `, [symbol, total_quantity]);
+      CALL process_trade($1, $2, $3)
+    `, [symbol, total_quantity, brokerId]);
 
     // Get the commission for the broker from the broker_account table
     const { rows: brokerAccountRows } = await pool.query(`
@@ -326,6 +326,7 @@ const registerTrader = async (data) => {
     const insertPhoneQuery = 'INSERT INTO phone_number (pan_number, phone_number) VALUES ($1, $2)';
     const insertPhoneValues = [data.pan_number, data.phone_number];
     await pool.query(insertPhoneQuery, insertPhoneValues);
+
 
     // Insert demat data into the Demat table
     const dematID = dematgen.generateDematID();
