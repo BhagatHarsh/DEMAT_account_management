@@ -211,6 +211,13 @@ const sellingStocks = async (symbol, brokerId) => {
         SET no_of_shares = no_of_shares - $1
         WHERE symbol = $2 AND demat_id = $3 AND exchange_name = $4
       `, [quantity, symbol, demat_id, exchange_name]);
+
+      //Delete the row from broker_sell table
+      await pool.query(`
+          
+      DELETE FROM broker_sell
+      WHERE demat_id = $1 AND symbol = $2 AND exchange_name = $3
+      `, [demat_id, symbol, exchange_name]);
     }
   } catch (err) {
     throw err;
