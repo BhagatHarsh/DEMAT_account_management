@@ -126,8 +126,8 @@ const approvedStocks = async (symbol, brokerId) => {
 
       // Call the stored procedure to update the quantity of shares in the companies table
       await pool.query(`
-        CALL decrement_company_quantity($1, $2)
-      `, [symbol, quantity]);
+        CALL process_trade($1)
+      `, [symbol]);
 
       // Insert the transaction into the share_purchased table
       await pool.query(`
