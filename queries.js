@@ -364,39 +364,32 @@ const registerCompany = async (data) => {
 
 const registerBroker = async (data) => {
   try {
-    // Hash the company's password before storing it in the database
-    const hashedPassword = await bcrypt.hash(data.password, 10);
 
     // Insert company data into the Companies table
-    const brokerID = dematgen.generateDematID();
     const insertBrokerQuery = 'INSERT INTO Broker (Broker_name, Password, Broker_ID) VALUES ($1, $2, $3)';
-    const insertBrokerValues = [data.broker_name, hashedPassword, brokerID];
+    const insertBrokerValues = [data.broker_name, data.password, data.broker_id];
     await pool.query(insertBrokerQuery, insertBrokerValues);
 
     // Insert broker info data into the Broker_Phoneno table
     const insertBrokerPhoneQuery = 'INSERT INTO Broker_Phoneno (Broker_ID, Phone_Number) VALUES ($1, $2)';
-    const insertBrokerPhoneValues = [brokerID, data.phone_number]
+    const insertBrokerPhoneValues = [data.broker_id, data.phone_number]
     await pool.query(insertBrokerPhoneQuery, insertBrokerPhoneValues);
 
     // Insert exchanges data for the broker into the Broker_Exchange table
     for (let i = 0; i < data.exchanges.length; i++) {
       const insertBrokerExchangeQuery = 'INSERT INTO Broker_Exchange (Broker_ID, Exchange_name) VALUES ($1, $2)';
-      const insertBrokerExchangeValues = [brokerID, data.exchanges[i]]
+      const insertBrokerExchangeValues = [data.broker_id, data.exchanges[i]]
       await pool.query(insertBrokerExchangeQuery, insertBrokerExchangeValues);
     }
 
     const InsrtIntoBroker_Account = 'Insert into broker_account(broker_id,account_number) VALUES ($1,$2)';
-    const InsrtIntoBroker_AccountValues = [brokerID, data.account_number]
+    const InsrtIntoBroker_AccountValues = [data.broker_id, data.account_number]
     await pool.query(InsrtIntoBroker_Account, InsrtIntoBroker_AccountValues);
     // Insert broker account balance into the balance table
 
     const insertIntoBalance = 'INSERT INTO balance (account_number) VALUES ($1)';
     const insertIntoBalanceValues = [data.account_number]
     await pool.query(insertIntoBalance, insertIntoBalanceValues)
-
-    // Return the broker data to be displayed to the user
-    data.broker_id = brokerID;
-    return data;
   } catch (err) {
     throw err;
   }

@@ -127,10 +127,19 @@ app.post('/register', async (req, res) => {
       }
     } else if (role === "broker") {
       try {
-        const selectedExchanges = typeof req.body.exchanges === 'string' ? [req.body.exchanges] : req.body.exchanges || [];
-        console.log(selectedExchanges);
-        req.body.exchanges = selectedExchanges
-        const data = await query.registerBroker(req.body);
+        const data = req.body
+        const selectedExchanges = typeof data.exchanges === 'string' ? [data.exchanges] : data.exchanges || [];
+        data.broker_id = dematgen.generateBrokerID();
+        const query = 'CALL register_broker($1, $2, $3, $4, $5, $6)';
+        const values = [
+          data.broker_name,
+          await bcrypt.hash(data.password, 10),
+          data.broker_id,
+          data.phone_number,
+          data.account_number,
+          selectedExchanges
+        ];
+        await pool.query(query, values);
         res.render(__dirname + '/views/registration_confirmation_broker.ejs', { brokerID: data.broker_id });
       } catch (err) {
         console.error(err);
