@@ -451,14 +451,6 @@ const getBrokerById = async (brokerId) => {
   }
 }
 
-const buyShares = async (data) => {
-  try {
-
-  } catch (err) {
-    throw err;
-  }
-};
-
 const getSharePurchased = async (demat_id) => {
   try {
     const query = `
@@ -678,7 +670,6 @@ const printFunctionsProceduresTriggers = async () => {
 
 // Export the functions for use in other modules
 module.exports = {
-  buyShares,
   getBrokerDetails,
   getCompaniesData,
   registerTrader,
