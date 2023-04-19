@@ -81,32 +81,32 @@ const approvedStocks = async (symbol, brokerId) => {
       CALL process_trade($1, $2, $3)
     `, [symbol, total_quantity, brokerId]);
 
-    // Get the commission for the broker from the broker_account table
-    const { rows: brokerAccountRows } = await pool.query(`
-      SELECT commission
-      FROM broker_account
-      WHERE broker_id = $1
-    `, [brokerId]);
-    const brokerCommissionPercent = brokerAccountRows[0].commission;
-
-    console.log('Broker Commission: ', brokerCommissionPercent);
-    console.log('Broker ID: ', brokerId);
-    console.log("brokerBuyRows: ", brokerBuyRows);
-    // Get the price of the symbol from the companies table
-    const { rows: companyRows } = await pool.query(`
-      SELECT price
-      FROM companies
-      WHERE symbol = $1
-    `, [symbol]);
-    const price = companyRows[0].price;
-
-    // Calculate the amount to be deducted from the demat account balance
-    const amount = price * total_quantity  ;
-    const commissionAmount = amount * (brokerCommissionPercent / 100);
-    const totalAmount = amount + commissionAmount;
-
     // For each demat ID, calculate the amount to be deducted from the balance
     for (const { demat_id, quantity, exchange_name } of brokerBuyRows) {
+
+      // Get the commission for the broker from the broker_account table
+    const { rows: brokerAccountRows } = await pool.query(`
+    SELECT commission
+    FROM broker_account
+    WHERE broker_id = $1
+  `, [brokerId]);
+  const brokerCommissionPercent = brokerAccountRows[0].commission;
+
+  console.log('Broker Commission: ', brokerCommissionPercent);
+  console.log('Broker ID: ', brokerId);
+  console.log("brokerBuyRows: ", brokerBuyRows);
+  // Get the price of the symbol from the companies table
+  const { rows: companyRows } = await pool.query(`
+    SELECT price
+    FROM companies
+    WHERE symbol = $1
+  `, [symbol]);
+  const price = companyRows[0].price;
+
+  // Calculate the amount to be deducted from the demat account balance
+  const amount = price * quantity  ;
+  const commissionAmount = amount * (brokerCommissionPercent / 100);
+  const totalAmount = amount + commissionAmount;
 
       console.log('Demat ID: ', demat_id);
       console.log('Symbol: ', symbol);
