@@ -344,9 +344,6 @@ const registerTrader = async (data) => {
 
 const registerCompany = async (data) => {
   try {
-    // Hash the company's password before storing it in the database
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-
     // Insert company data into the Companies table
     const insertCompanyQuery = 'INSERT INTO Companies (Symbol, Company_name) VALUES ($1, $2)';
     const insertCompanyValues = [data.company_symbol, data.company_name];
@@ -354,7 +351,7 @@ const registerCompany = async (data) => {
 
     // Insert company info data into the Company_info table
     const insertCompanyInfoQuery = 'INSERT INTO Company_info (GST_Number, password, Symbol) VALUES ($1, $2, $3)';
-    const insertCompanyInfoValues = [data.gst_number, hashedPassword, data.company_symbol];
+    const insertCompanyInfoValues = [data.gst_number, data.password, data.company_symbol];
     await pool.query(insertCompanyInfoQuery, insertCompanyInfoValues);
 
     // Return the company symbol to be displayed to the user
@@ -605,19 +602,20 @@ const resetDatabase = async () => {
     const tables = [
       'phone_number',
       'share_purchased',
+      'broker_buy',
+      'broker_sell',
       // 'broker_exchange',
-      'listing',
-      // 'company_info',
-      // 'companies',
-      // 'demat_broker',
+      'company_info',
+      'companies',
+      'demat_broker',
       'demat_details',
       // 'broker_phoneno',
       // 'broker_account',
-      'banks',
       'balance',
       // 'broker',
       'demat',
       'users',
+      'banks',
       // 'exchanges'
     ];
 

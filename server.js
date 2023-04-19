@@ -6,6 +6,7 @@ const query = require('./queries')
 const path = require('path')
 const bcrypt = require('bcrypt')
 const pool = require('./dbConfig').pool
+const dematgen = require('./utils/dematgen')
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
@@ -83,8 +84,25 @@ app.post('/register', async (req, res) => {
   if (role) {
     if (role === "trader") {
       try {
-        const data = await query.registerTrader(req.body);
-        res.render(__dirname + '/views/registration_confirmation_trader.ejs', { dematID: data.demat_id });
+        const reqBody = req.body
+        const demat_id = dematgen.generateDematID();
+        await pool.query(
+          "CALL register_trader($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);",
+          [
+            reqBody.pan_number,
+            reqBody.first_name,
+            reqBody.last_name,
+            reqBody.ifsc_code,
+            reqBody.pincode,
+            reqBody.password,
+            reqBody.bank_name,
+            reqBody.phone_number,
+            reqBody.account_number,
+            reqBody.broker,
+            demat_id
+          ]
+        );
+        res.render(__dirname + '/views/registration_confirmation_trader.ejs', { dematID: demat_id });
       } catch (err) {
         console.error(err);
         res.status(500).send('Error inserting user data');
@@ -92,7 +110,15 @@ app.post('/register', async (req, res) => {
       }
     } else if (role === "company") {
       try {
-        const data = await query.registerCompany(req.body);
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const query = 'CALL register_company($1, $2, $3, $4)';
+        const values = [
+          data.company_symbol,
+          data.company_name,
+          data.gst_number,
+          hashedPassword
+        ];
+        await pool.query(query, values);
         res.render(__dirname + '/views/registration_confirmation_company.ejs');
       } catch (err) {
         console.error(err);
@@ -196,9 +222,9 @@ app.post('/approved_stocks', async (req, res) => {
   try {
     const data = req.body
     console.log("/approved_stocks", data)
-    if(data.type === "buyer"){
+    if (data.type === "buyer") {
       query.approvedStocks(data.symbol, data.user.broker_id)
-    }else if(data.type === "seller"){
+    } else if (data.type === "seller") {
       query.sellingStocks(data.symbol, data.user.broker_id)
     }
     res.status(200).send("sucess")
@@ -277,7 +303,7 @@ app.get('/main_table', async (req, res) => {
   try {
     const data = await query.getMainTableData(data1.broker_name);
     // console.log(data)
-    res.render(__dirname + '/views/broker_main.ejs', { "buyer" : data.buyer, "seller" : data.seller });
+    res.render(__dirname + '/views/broker_main.ejs', { "buyer": data.buyer, "seller": data.seller });
   }
   catch (err) {
     console.error(err);
