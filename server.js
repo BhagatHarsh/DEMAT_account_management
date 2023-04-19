@@ -110,6 +110,7 @@ app.post('/register', async (req, res) => {
       }
     } else if (role === "company") {
       try {
+        const data = req.body
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const query = 'CALL register_company($1, $2, $3, $4)';
         const values = [
