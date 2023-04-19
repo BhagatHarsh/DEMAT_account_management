@@ -130,7 +130,7 @@ app.post('/register', async (req, res) => {
       try {
         const data = req.body
         const selectedExchanges = typeof data.exchanges === 'string' ? [data.exchanges] : data.exchanges || [];
-        data.broker_id = dematgen.generateBrokerID();
+        data.broker_id = dematgen.generateDematID();
         const query = 'CALL register_broker($1, $2, $3, $4, $5, $6)';
         const values = [
           data.broker_name,
