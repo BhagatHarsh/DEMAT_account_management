@@ -86,6 +86,7 @@ app.post('/register', async (req, res) => {
       try {
         const reqBody = req.body
         const demat_id = dematgen.generateDematID();
+        reqBody.password = await bcrypt.hash(reqBody.password, 10);
         await pool.query(
           "CALL register_trader($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);",
           [
